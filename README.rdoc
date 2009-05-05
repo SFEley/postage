@@ -1,5 +1,4 @@
-Postage Plugin
-==============
+= Postage Plugin
 
 This is the developer plug-in for Postage.
 
@@ -7,8 +6,9 @@ The API is described at:
 
   http://postageapp.com/doc/
 
-Example
-=======
+== Example
+
+  Postage.new(:api_key => 'ABC').send_message('test_message', %w[ bob@example.com joe@example.com ])
 
 (C) 2009 The Working Group Inc.
 http://www.twg.ca/
