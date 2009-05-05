@@ -1,0 +1,1 @@
+require 'postage_plugin'
