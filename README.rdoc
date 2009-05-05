@@ -5,10 +5,21 @@ This is the developer plug-in for Postage.
 The API is described at:
 
   http://postageapp.com/doc/
+  
+== Installation
+
+  script/plugin install git://github.com/theworkinggroup/postage_plugin.git
 
 == Example
 
   Postage.new(:api_key => 'ABC').send_message('test_message', %w[ bob@example.com joe@example.com ])
+  
+  
+The API key can also be specified in a configuration file:
+
+  # config/postage.yml
+  defaults:
+    api_key: ABCABCABCABC
 
 (C) 2009 The Working Group Inc.
 http://www.twg.ca/
