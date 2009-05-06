@@ -8,7 +8,12 @@ class Postage
     # == Constants ==========================================================
     
     DEFAULT_HOSTNAME = 'http://postageapp.com'.freeze
-    CONFIG_FILE = "#{RAILS_ROOT}/config/postage.yml".freeze
+    CONFIG_FILES = [
+      "#{RAILS_ROOT}/config/postage.yaml",
+      "#{RAILS_ROOT}/config/postage.yml",
+      "#{RAILS_ROOT}/config/postageapp.yaml",
+      "#{RAILS_ROOT}/config/postageapp.yml"
+    ].freeze
     
     # == Class Methods ======================================================
 
@@ -21,7 +26,11 @@ class Postage
     # == Instance Methods ===================================================
 
     def initialize(env)
-      @config = YAML.load(File.open(CONFIG_FILE))
+      config_file = CONFIG_FILES.find do |path|
+        File.exist?(path)
+      end
+      
+      @config = (config_file and YAML.load(File.open(config_file)))
       
       @env_config = self.class.defaults(@config && @config[env] && @config[env].symbolize_keys)
     end
