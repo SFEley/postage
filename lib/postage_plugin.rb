@@ -63,7 +63,7 @@ class Postage
 
   def initialize(options = { })
     @api_key = options[:api_key] || self.class.config.api_key
-    @format = (options[:format] || :xml).to_sym
+    @format = (options[:format] || :json).to_sym
   end
   
   def send_message(message, recipients, variables = nil, headers = nil)
@@ -91,14 +91,22 @@ protected
       :headers => {
         'Content-Type' => "application/#{@format}"
       },
-      :body => encode_params(params)
+      :body => encode_params(params, @format),
+      :format => @format
     )
   end
   
-  def encode_params(hash)
-    name = hash.keys.first.to_s
-    data = hash.values.first
-    
-    data.to_xml(:root => name, :type => 'hash')
+  def encode_params(hash, format = :yaml)
+    case (format)
+    when :xml
+      name = hash.keys.first.to_s
+      data = hash.values.first
+
+      data.to_xml(:root => name, :type => 'hash')
+    when :yaml
+      hash.to_yaml
+    else
+      hash.to_json
+    end
   end
 end
