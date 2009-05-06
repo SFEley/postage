@@ -22,10 +22,10 @@ class Postage
     
     # == Class Methods ======================================================
 
-    def self.defaults(options)
+    def self.defaults
       {
         :url => DEFAULT_HOSTNAME
-      }.merge(options || { })
+      }
     end
     
     # == Instance Methods ===================================================
@@ -37,19 +37,25 @@ class Postage
       
       @config = (config_file and YAML.load(File.open(config_file)))
       
-      @env_config = self.class.defaults(@config && @config[env] && @config[env].symbolize_keys)
+      @env_config = self.class.defaults
+      
+      [ @config['defaults'], @config[env] ].each do |options|
+        if (options)
+          @env_config = @env_config.merge(options.symbolize_keys)
+        end
+      end
     end
     
     def [](key)
-      @env_config[key.to_sym] or @config['defaults'] and @config['defaults'][key.to_sym]
+      @env_config[key.to_sym]
     end
     
     def url
-      self[:url]
+      @env_config[:url]
     end
     
     def api_key
-      self[:api_key]
+      @env_config[:api_key]
     end
   end
   
