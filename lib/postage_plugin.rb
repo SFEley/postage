@@ -1,4 +1,9 @@
 class Postage
+  # == Constants ============================================================
+  
+  POSTAGE_API_VERSION = '0.1.0'
+  VERSION = '0.1.0'
+
   # == Utility Classes ======================================================
 
   class Exception < ::Exception
