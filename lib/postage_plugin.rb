@@ -41,15 +41,15 @@ class Postage
     end
     
     def [](key)
-      @env_config[key.to_sym]
+      @env_config[key.to_sym] or @config['defaults'] and @config['defaults'][key.to_sym]
     end
     
     def url
-      @env_config[:url]
+      self[:url]
     end
     
     def api_key
-      @env_config[:api_key]
+      self[:api_key]
     end
   end
   
