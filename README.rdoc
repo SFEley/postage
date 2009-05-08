@@ -1,14 +1,13 @@
-= Postage Plugin
+= Postage
+Author:: {The Working Group, Inc}[http://www.theworkinggroup.ca]
+Version:: 0.1.1
+Documentation:: http://postageapp.com/doc/
 
 This is the developer plug-in for Postage.
 
-The API is described at:
-
-  http://postageapp.com/doc/
-  
 == Installation
 
-  script/plugin install git://github.com/theworkinggroup/postage_plugin.git
+  script/plugin install git://github.com/theworkinggroup/postage.git
 
 == Example
 
