@@ -6,11 +6,11 @@
 # ---
 # = Usage:
 #   
-#   require 'postage_plugin'
+#   require 'postage'
 #   
 #   Postage.new.send_message('message_name', 'recipient@example.com')
 
-# Author:: Scott Tadman (scott@twg.ca)
+# Author:: Scott Tadman (scott@twg.ca), Jack Neto (jack@twg.ca)
 # Copyright:: Copyright (c) 2009 The Working Group Inc.
 # License:: Distributes under the same terms as Ruby
 
