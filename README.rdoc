@@ -1,16 +1,15 @@
-= Postage Plugin
+= Postage
+Author:: {The Working Group, Inc}[http://www.theworkinggroup.ca]
+Version:: 0.1.1
+Documentation:: http://postageapp.com/doc/
 
 This is the developer plug-in for Postage.
 
-The API is described at:
-
-  http://postageapp.com/doc/
-  
 == Installation
 
 As with any typical Rails plugin, installation is done with script/plugin:
 
-  % script/plugin install git://github.com/theworkinggroup/postage_plugin.git
+  % script/plugin install git://github.com/theworkinggroup/postage.git
   
 The next step would be to download a sample configuration file and copy it
 to config/postage.yml with the appropriate environment(s) set:
