@@ -7,18 +7,26 @@ This is the developer plug-in for Postage.
 
 == Installation
 
-  script/plugin install git://github.com/theworkinggroup/postage.git
+As with any typical Rails plugin, installation is done with script/plugin:
 
-== Example
-
-  Postage.new(:api_key => 'ABC').send_message('test_message', %w[ bob@example.com joe@example.com ])
+  % script/plugin install git://github.com/theworkinggroup/postage.git
   
-  
-The API key can also be specified in a configuration file:
+The next step would be to download a sample configuration file and copy it
+to config/postage.yml with the appropriate environment(s) set:
 
   # config/postage.yml
   defaults:
-    api_key: ABCABCABCABC
+    api_key: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-(C) 2009 The Working Group Inc.
-http://www.twg.ca/
+Note that different API keys can be used for development, production, etc. by
+simply adding the appropriate section.
+
+To test that the installation succeeded and that the API key is valid, run:
+
+  % rake postage:test
+
+== Example
+
+  Postage.new.send_message('test_message', %w[ bob@example.com joe@example.com ])
+
+(C) 2009 The Working Group Inc. ( http://www.twg.ca/ )

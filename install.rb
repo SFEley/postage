@@ -1,1 +1,3 @@
-# Install hook code here
+unless (Postage.config.exist?)
+  # Write configuration file
+end
