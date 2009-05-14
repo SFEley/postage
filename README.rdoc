@@ -1,7 +1,7 @@
 = Postage
 Author:: {The Working Group, Inc}[http://www.theworkinggroup.ca]
 Version:: 0.1.1
-Documentation:: http://postageapp.com/doc/
+Documentation:: http://postageapp.com/doc
 
 This is the developer plug-in for Postage.
 

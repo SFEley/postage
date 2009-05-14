@@ -21,11 +21,28 @@ module PostageMailer
 
 
     def carry(mail)
+      # Collect the headers
+      header = {
+        'Subject'   => mail.subject, 
+        'From'      => mail.from
+      } 
+      mail.headers.each{ |k, v| header[k] = v }
+
+      # Collect the parts
       parts = {}
+      attachments = {}
       mail.parts.each do |part|
-        parts[part.content_type] = part.body
+        case part.content_disposition
+          when 'inline' 
+            parts[part.content_type] = part.body
+          when 'attachment'
+            attachments[part.filename] = {:content_type => part.content_type, :content => part.body }
+        end
       end
-      Postage.new.send_message(parts, mail.postage_data, {}, {:Subject => mail.subject, :From => mail.from})
+      parts[:attachments] = attachments unless attachments.blank?
+
+      # Send it all
+      Postage.new.send_message(parts, mail.postage_data, {}, header)
     end
     
     
