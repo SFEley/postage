@@ -1,4 +1,5 @@
 module PostageMailer
+  
   def self.included(base)
     base.send(:extend, ClassMethods)
     base.send(:include, InstanceMethods)
@@ -9,6 +10,8 @@ module PostageMailer
     end
   end
   
+  
+  # >> Class Methods -----------------------------------------------------
   module ClassMethods
     
     def method_missing_with_postage(method_symbol, *parameters) 
@@ -41,15 +44,22 @@ module PostageMailer
       end
       parts[:attachments] = attachments unless attachments.blank?
 
+      # Collect specific postage data or the recipient list if no postage data was specified
+      postage_data = mail.postage_data.blank? ? mail.recipients : mail.postage_data
+
       # Send it all
-      Postage.new.send_message(parts, mail.postage_data, {}, header)
+      Postage.new.send_message(parts, postage_data, {}, header)
     end
-    
-    
+
   end
-  
-  
+
+
+  # >> Instance Methods -----------------------------------------------------
   module InstanceMethods
-    attr_accessor :postage_data
+    attr_writer :postage_data
+
+    def postage_data
+      @postage_data ||= { }
+    end
   end
 end
