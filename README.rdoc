@@ -80,7 +80,7 @@ If you wanted to use a substitution variable called <tt>{{first_name}}</tt>, you
     .
   }
 
-  So, let's say that you want to send personalized invitations to a bunch of people where each email looks pretty much the same except for the subject and the greeting on the top of the email. 
+So, let's say that you want to send personalized invitations to a bunch of people where each email looks pretty much the same except for the subject and the greeting on the top of the email. 
 
 Our UserMailer now looks a bit different since we need to collect the first name of each user. Notice that we are using a <tt>{{first_name}}</tt> substitution variable on the subject.
 
