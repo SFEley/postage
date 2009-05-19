@@ -24,6 +24,14 @@ simply adding the appropriate section.
 To test that the installation succeeded and that the API key is valid, run:
 
   % rake postage:test
+  
+Finally tell ActionMailer that you want your emails yo be delivered through Postage.
+
+Just add the following to your config file:
+
+  ActionMailer::Base.delivery_method = :postage
+  
+
 
 == Rails usage
   
@@ -59,20 +67,18 @@ Your HTML view also look the same as usual:
   <p>Regards,</p>
   
 
-The only change is in the way you call your mailer class. 
+To send all those emails you do, as usual:
 
-Instead of <tt>deliver_some_email</tt> you will now use <tt>carry_some_email</tt> like so:
-
-  UserMailer::carry_forgot_password(user)
+  UserMailer::deliver_forgot_password(user)
 
   
 === Mass mailing for all!
 
-To send multiple emails in one go, Postage uses substitution variables that look like: <tt>{{some_variable}}</tt>. In order to use them you'll have to provide the value of each substitution variable for each different user. 
+To send multiple emails in one go, Postage uses substitution variables that look like: <tt>{{some_variable}}</tt>. In order to use them you'll have to provide in the <tt>@recipients</tt> variable, the value of each substitution variable, for each of the recipients of the message. 
 
 If you wanted to use a substitution variable called <tt>{{first_name}}</tt>, you would have to build a structure similar to:
 
-  postage_data => {
+  @recipients => {
     'user_1@test.com' => {:first_name => 'User 1'},
     'user_2@test.com' => {:first_name => 'User 2'},
     'user_3@test.com' => ...
@@ -94,8 +100,9 @@ Our UserMailer now looks a bit different since we need to collect the first name
       headers("Reply-to" => @from)
       
       # Collecting Postage data
+      @recipients = {}
       users.each do |user|
-        postage_data[user.email] = {:first_name => user.first_name}
+        @recipients[user.email] = {:first_name => user.first_name}
       end
     end
   
@@ -110,9 +117,9 @@ And here's how the HTML view looks like. Notice that we're using the <tt>{{first
   <p>Regards,</p>
 
 
-To send all those emails you do:
+To send all those emails you do, as usual:
 
-  UserMailer::carry_event_invitation(users, event)
+  UserMailer::deliver_event_invitation(users, event)
 
 
 
