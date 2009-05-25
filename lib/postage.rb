@@ -120,17 +120,17 @@ class Postage
     arguments = {
       :recipients => recipients
     }
-
+    
     case (message)
     when String
       arguments[:message_name] = message
     when Hash
       arguments[:message] = message
     end
-    
+        
     arguments[:variables] = variables unless (variables.blank?)
     arguments[:headers] = headers unless (headers.blank?)
-    
+
     self.api_call(:send_message, :arguments => arguments)
   end
   
@@ -143,7 +143,7 @@ protected
       },
       :body => encode_params(params, @format),
       :format => @format
-    )
+    )    
   end
   
   def encode_params(hash, format = :yaml)

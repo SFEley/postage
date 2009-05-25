@@ -7,7 +7,9 @@ module PostageMailer
   # >> Instance Methods -----------------------------------------------------
   module InstanceMethods
 
-    def perform_delivery_postage(mail)
+    def perform_delivery_postage(mail)      
+      require "base64"
+
       # Collect the headers
       header = {
         'Subject'   => self.subject, 
@@ -18,14 +20,24 @@ module PostageMailer
       # Collect the parts
       parts = {}
       attachments = {}
-      self.parts.each do |part|
-        case part.content_disposition
-          when 'inline' 
-            parts[part.content_type] = part.body
-          when 'attachment'
-            attachments[part.filename] = {:content_type => part.content_type, :content => part.body }
+
+      if self.parts.blank?
+        parts[self.content_type] = self.body
+      else
+        self.parts.each do |part|
+          case part.content_disposition
+            when 'inline'
+              parts[self.content_type] = part.body
+            when 'attachment'
+              attachments[part.filename] = {
+                'filename' => part.filename,
+                'content_type' => part.content_type, 
+                'content' => Base64.encode64(part.body)
+              }
+          end
         end
       end
+
       parts[:attachments] = attachments unless attachments.blank?
 
       # Send it all
