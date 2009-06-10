@@ -27,7 +27,7 @@ module PostageMailer
         self.parts.each do |part|
           case part.content_disposition
             when 'inline'
-              parts[self.content_type] = part.body
+              parts[part.content_type] = part.body
             when 'attachment'
               attachments[part.filename] = {
                 'filename' => part.filename,
