@@ -122,7 +122,7 @@ class Postage
     options ||= { }
     @api_key = options[:api_key] || self.class.config.api_key
     @format = (options[:format] || :json).to_sym
-    @force_recipient = options[:force_recipient] || self.class.config.api_key
+    @force_recipient = options[:force_recipient] || self.class.config.force_recipient
   end
   
   def send_message(message, recipients, variables = nil, headers = nil)
