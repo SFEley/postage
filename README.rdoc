@@ -7,30 +7,43 @@ This is the developer plug-in for Postage.
 
 == Installation
 
-As with any typical Rails plugin, installation is done with script/plugin:
+1. As with any typical Rails plugin, installation is done with script/plugin:
 
   % script/plugin install git://github.com/theworkinggroup/postage.git
   
-The next step would be to download a sample configuration file and copy it
+2. The next step would be to download a sample configuration file and copy it
 to config/postage.yml with the appropriate environment(s) set:
 
   # config/postage.yml
-  defaults:
+  development:
     api_key: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 Note that different API keys can be used for development, production, etc. by
 simply adding the appropriate section.
 
-To test that the installation succeeded and that the API key is valid, run:
+3. To test that the installation succeeded and that the API key is valid, run:
 
   % rake postage:test
   
-Finally tell ActionMailer that you want your emails yo be delivered through Postage.
+4. Finally tell ActionMailer that you want your emails yo be delivered through Postage.
 
 Just add the following to your config file:
 
   ActionMailer::Base.delivery_method = :postage
   
+
+== Recipient override
+
+When developing an application it is often useful to override the list of recipients with your own email. 
+this way you'll avoid sending emails to real people when you're developing your app.
+
+To do this just add the following line to your development.rb file:
+
+  PostageMailer::Config.recipients = 'my_email@somewhere.com'
+
+You can also pass an array of emails if you need to:
+  
+  PostageMailer::Config.recipients = ['me@somewhere.com', 'you@somewhere.com']
 
 
 == Rails usage
