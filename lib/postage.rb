@@ -118,6 +118,7 @@ class Postage
     options ||= { }
     @api_key = options[:api_key] || self.class.config.api_key
     @format = (options[:format] || :json).to_sym
+    @force_recipient = options[:force_recipient]
   end
   
   def send_message(message, recipients, variables = nil, headers = nil)
@@ -135,9 +136,9 @@ class Postage
     arguments[:variables] = variables unless (variables.blank?)
     arguments[:headers] = headers unless (headers.blank?)
     
-    if (options[:force_recipient])
+    if (@force_recipient)
       arguments[:transmission] ||= { }
-      arguments[:transmission][:recipient] = options[:force_recipient]
+      arguments[:transmission][:recipient] = @force_recipient
     end
 
     self.api_call(:send_message, :arguments => arguments)
