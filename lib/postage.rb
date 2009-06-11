@@ -97,6 +97,10 @@ class Postage
     def api_key
       @env_config[:api_key]
     end
+    
+    def force_recipient
+      @env_config[:force_recipient]
+    end
   end
   
   # == Extensions ===========================================================
@@ -118,7 +122,7 @@ class Postage
     options ||= { }
     @api_key = options[:api_key] || self.class.config.api_key
     @format = (options[:format] || :json).to_sym
-    @force_recipient = options[:force_recipient]
+    @force_recipient = options[:force_recipient] || self.class.config.api_key
   end
   
   def send_message(message, recipients, variables = nil, headers = nil)
