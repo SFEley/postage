@@ -7,11 +7,11 @@ This is the developer plug-in for Postage.
 
 == Installation
 
-1. As with any typical Rails plugin, installation is done with script/plugin:
+1 - As with any typical Rails plugin, installation is done with script/plugin:
 
   % script/plugin install git://github.com/theworkinggroup/postage.git
   
-2. The next step would be to download a sample configuration file and copy it
+2 -The next step would be to download a sample configuration file and copy it
 to config/postage.yml with the appropriate environment(s) set:
 
   # config/postage.yml
@@ -21,11 +21,11 @@ to config/postage.yml with the appropriate environment(s) set:
 Note that different API keys can be used for development, production, etc. by
 simply adding the appropriate section.
 
-3. To test that the installation succeeded and that the API key is valid, run:
+3 - To test that the installation succeeded and that the API key is valid, run:
 
   % rake postage:test
   
-4. Finally tell ActionMailer that you want your emails yo be delivered through Postage.
+4 - Finally tell ActionMailer that you want your emails yo be delivered through Postage.
 
 Just add the following to your config file:
 
