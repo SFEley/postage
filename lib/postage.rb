@@ -88,6 +88,10 @@ class Postage
       @env_config[key.to_sym] = value
     end
     
+    def keys
+      @env_config.keys
+    end
+    
     # Returns the base URL used for API calls
     def url
       @env_config[:url]
@@ -125,6 +129,10 @@ class Postage
     @force_recipient = options[:force_recipient] || self.class.config.force_recipient
   end
   
+  def test
+    self.api_call(:project_info)
+  end
+  
   def send_message(message, recipients, variables = nil, headers = nil)
     arguments = {
       :recipients => recipients
@@ -149,7 +157,7 @@ class Postage
   end
   
 protected
-  def api_call(action, params)
+  def api_call(action, params = nil)
     self.class.post(
       "#{self.class.config.url}/api/#{@api_key}/#{action}.#{@format}",
       :headers => {
@@ -161,6 +169,8 @@ protected
   end
   
   def encode_params(hash, format = :yaml)
+    return '' unless (hash)
+    
     case (format)
     when :xml
       name = hash.keys.first.to_s
