@@ -83,6 +83,10 @@ class Postage
     def [](key)
       @env_config[key.to_sym]
     end
+
+    def []=(key, value)
+      @env_config[key.to_sym] = value
+    end
     
     # Returns the base URL used for API calls
     def url
@@ -127,9 +131,14 @@ class Postage
     when Hash
       arguments[:message] = message
     end
-        
+    
     arguments[:variables] = variables unless (variables.blank?)
     arguments[:headers] = headers unless (headers.blank?)
+    
+    if (options[:force_recipient])
+      arguments[:transmission] ||= { }
+      arguments[:transmission][:recipient] = options[:force_recipient]
+    end
 
     self.api_call(:send_message, :arguments => arguments)
   end
