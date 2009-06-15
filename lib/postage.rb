@@ -64,13 +64,12 @@ class Postage
 
   # An instance of Postage may be created with options that override those
   # found in the configuration file.
-  def initialize(config)
-    options ||= { }
-    @api_key = options[:api_key] || self.class.config.api_key
-    @format = (options[:format] || :json).to_sym
-
-    @force_recipient = options[:force_recipient] ||
-      self.class.config.force_recipient
+  def initialize(config = nil)
+    @config = config || self.class.config
+    
+    @api_key = @config.api_key
+    @api_format = @config.api_format
+    @force_recipient = @config.api_format
   end
   
   def test
@@ -103,12 +102,12 @@ class Postage
 protected
   def api_call(action, params = nil)
     make_reliable_post(
-      "#{self.class.config.url}/api/#{@api_key}/#{action}.#{@format}",
+      "#{self.class.config.url}/api/#{@api_key}/#{action}.#{@api_format}",
       :headers => {
-        'Content-Type' => "application/#{@format}"
+        'Content-Type' => "application/#{@api_format}"
       },
-      :body => encode_params(params, @format),
-      :format => @format,
+      :body => encode_params(params, @api_format),
+      :format => @api_format,
       :timeout => 2
     )
   end
@@ -131,10 +130,10 @@ protected
     end
   end
   
-  def encode_params(hash, format = :yaml)
+  def encode_params(hash, api_format = :yaml)
     return '' unless (hash)
     
-    case (format)
+    case (api_format)
     when :xml
       name = hash.keys.first.to_s
       data = hash.values.first
