@@ -1,3 +1,5 @@
+$LOAD_PATH << File.join(File.dirname(__FILE__), 'lib')
+
 require 'postage'
 
 unless (Postage.config.exists?)
