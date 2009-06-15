@@ -56,5 +56,11 @@ end
 
 puts ""
 puts "==========================================================================="
+puts ""
+puts "  Check that the plugin is installed correctly using:"
+puts ""
+puts "    rake postage:test"
+puts ""
+puts "==========================================================================="
 puts "  http://postageapp.com/"
 puts "==========================================================================="
