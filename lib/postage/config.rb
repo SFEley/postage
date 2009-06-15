@@ -1,5 +1,5 @@
 class Postage
-  class Configuration
+  class Config
     # == Constants ==========================================================
     
     DEFAULT_HOSTNAME = 'http://postageapp.com'.freeze

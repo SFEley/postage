@@ -52,7 +52,7 @@ class Postage
   # == Class Methods ========================================================
   
   def self.config
-    @config ||= Configuration.new(Rails.env)
+    @config ||= Config.new(Rails.env)
   end
   
   # == Instance Methods =====================================================
