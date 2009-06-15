@@ -60,6 +60,14 @@ class Postage
     @config ||= Config.new
   end
   
+  def self.queue
+    Dir.entries(config.queue_path).select do |file|
+      file.match(/\.yaml$/)
+    end.collect do |file|
+      file.split(/\./)
+    end
+  end
+  
   # == Instance Methods =====================================================
 
   # An instance of Postage may be created with options that override those
@@ -116,15 +124,15 @@ protected
     self.class.post(action, params)
   rescue Timeout::Error, Exception => e
     # Timeout on connection
-    save_to_queue("\##{e}\n" + [ action, params ].to_yaml)
+    save_to_queue(action, "\##{e}\n" + [ action, params ].to_yaml)
   end
   
-  def save_to_queue(content = nil)
+  def save_to_queue(action, content = nil)
     queue_path = self.class.config.queue_path
     
     FileUtils.mkdir_p(queue_path) unless (File.exist?(queue_path))
     
-    open(File.join(queue_path, "%.9f.%06d.yaml" % [ Time.now.to_f, $$ ]), 'w') do |fh|
+    open(File.join(queue_path, "%.9f.%06d.%s.yaml" % [ Time.now.to_f, $$, action ]), 'w') do |fh|
       fh.write(content) if (content)
       yield(fh) if (block_given?)
     end

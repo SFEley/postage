@@ -15,6 +15,19 @@ namespace :postage do
       puts "  * A valid key can be obtained from #{Postage.config.url}"
     end
   end
+
+  desc "Show Postage queue contents"
+  task :queue => :environment do
+    entries = Postage.queue
+    
+    if (entries.empty?)
+      puts "Queue empty."
+    else
+      entries.each do |entry|
+        puts "%30s %16s" % [ Time.at(entry[0].to_i).to_s, entry[3] ]
+      end
+    end
+  end
   
   desc "Test Postage configuration"
   task :test => :environment do

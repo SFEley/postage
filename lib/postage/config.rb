@@ -16,7 +16,7 @@ class Postage
 
     DEFAULT_CONFIGURATION = {
       :url => DEFAULT_HOSTNAME,
-      :queue_path => File.join(BASE_PATH, 'tmp', 'postage')
+      :queue_path => File.join(BASE_PATH, 'tmp', 'postage'),
       :api_format => :json
     }.freeze
 
