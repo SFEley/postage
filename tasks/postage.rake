@@ -31,6 +31,11 @@ namespace :postage do
     end
   end
   
+  desc "Retry queued API calls"
+  task :retry => :environment do
+    Postage.retry!
+  end
+  
   desc "Test Postage configuration"
   task :test => :environment do
     puts "Testing Postage configuration for #{Rails.env}"

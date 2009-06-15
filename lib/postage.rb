@@ -60,10 +60,14 @@ class Postage
     @config ||= Config.new
   end
   
-  def self.queue
+  def self.queued_transactions
     Dir.entries(config.queue_path).select do |file|
       file.match(/\.yaml$/)
-    end.collect do |file|
+    end
+  end
+  
+  def self.queue
+    queued_transactions.collect do |file|
       path = File.join(config.queue_path, file)
       reason = nil
       url = nil
@@ -77,6 +81,45 @@ class Postage
       end
 
       file.split(/\./) << reason << url
+    end
+  end
+  
+  def self.retry!
+    require 'timeout'
+    
+    queued_transactions.each do |filename|
+      path = File.join(config.queue_path, filename)
+      file = File.new(path)
+
+      begin
+        puts filename
+
+        locked = false
+
+        Timeout::timeout(1) do
+          file.flock(File::LOCK_EX)
+          locked = true
+        end
+
+        if (locked)
+          params = YAML.load(open(path))
+
+          puts "\tPosting to #{params.first}"
+          post(*params)
+        
+          File.unlink(path)
+
+          puts "\tSent."
+        end
+      rescue Timeout::Error, Exception => e
+        STDERR.puts(e.to_s)
+        # Skip for now, can't finish
+      rescue => e
+        STDERR.puts(e.to_s)
+        # YAML-related errors
+      ensure
+        file.flock(File::LOCK_UN)
+      end
     end
   end
   
