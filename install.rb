@@ -8,7 +8,7 @@ puts "==========================================================================
 puts ""
 puts "  Check the configuration file and make any changes as required:"
 puts ""
-puts "     #{Postage.config.config_file_path}"
+puts "     #{Postage.config.file_path}"
 puts ""
 puts "  Testing required Ruby Gems:"
 

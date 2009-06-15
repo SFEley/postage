@@ -15,6 +15,10 @@ class Postage
       :queue_path => "#{Rails.root}/tmp/postage",
       :api_format => :json
     }.freeze
+
+    # == Properties =========================================================
+    
+    attr_reader :file_path
     
     # == Class Methods ======================================================
 
@@ -36,14 +40,19 @@ class Postage
     # configuration file.
     # +env+ The Rails environment to load
     def initialize(env)
-      config_file = self.class.config_file_path
+      @file_path = self.class.config_file_path
       
       @env_config = DEFAULT_CONFIGURATION
       
-      if (@config = (config_file and YAML.load(File.open(config_file))))
+      begin
+        @config = YAML.load(File.open(@file_path))
+
         [ @config['defaults'], @config[env] ].compact.each do |options|
           @env_config = @env_config.merge(options.symbolize_keys)
         end
+      rescue => e
+        @config_exception = e.to_s
+        @file_path = nil
       end
       
       # Convert some options to Symbol from String
@@ -55,12 +64,14 @@ class Postage
     # Will return +true+ if a configuration file was found and loaded, or
     # +false+ otherwise.
     def exists?
-      @env_config != DEFAULT_CONFIGURATION
+      !!@file_path
     end
     
     # Creates the configuration file with standard defaults defined.
     def create!
-      open(self.class.default_config_file_path, 'w') do |fh|
+      @file_path = self.class.default_config_file_path
+      
+      open(@file_path, 'w') do |fh|
         fh.puts *[
           "defaults: &defaults",
           @env_config.collect { |k,v| "  #{k}: #{v}" },
@@ -119,6 +130,12 @@ class Postage
 
     def queue_path=(value)
       @env_config[:queue_path] = value.to_s
+    end
+
+    # Returns the path of the configuration file that was loaded, or nil
+    # if no file was loaded
+    def file_path
+      @file_path
     end
   end
 end
