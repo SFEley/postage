@@ -16,7 +16,7 @@ to config/postage.yml with the appropriate environment(s) set:
 
   # config/postage.yml
   development:
-    api_key: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    api_key: INSERT_VALID_API_KEY_HERE
 
 Note that different API keys can be used for development, production, etc. by
 simply adding the appropriate section.
@@ -45,7 +45,7 @@ You can also pass an array of emails if you need to:
   Postage.config.force_recipient = %w[ me@somewhere.com you@somewhere.com ]
 
 == Rails usage
-  
+
 Postage integrates seamlessly with Rails. Only a few minor changes are needed when assembling your emails.
 
 You can create your email views and layouts the same way you usually do.
