@@ -1,6 +1,10 @@
+require 'fileutils'
+
+gem 'httparty'
+
 require 'postage'
 
-# Inject methods into ActionMailer::Base for compabibility
+# Install the perform_delivery_postage method into ActionMailer
 class ActionMailer::Base
-  include PostageMailer
+  include Postage::Mailer
 end

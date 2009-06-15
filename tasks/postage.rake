@@ -19,7 +19,11 @@ namespace :postage do
       puts "Error: #{result['error']['message']}"
       puts "NOTE: Run rake:config to see the configuration being used"
     else
-      puts "Success!"
+      if (result['project'])
+        puts "Project URL: #{result['project']['href']}"
+      else
+        puts "No project information retrieved."
+      end
     end
   end
 end

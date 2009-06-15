@@ -1,6 +1,6 @@
 = Postage
-Author:: {The Working Group, Inc}[http://www.theworkinggroup.ca]
-Version:: 0.1.1
+Author:: {The Working Group, Inc}[http://www.twg.ca/]
+Version:: 0.2.0
 Documentation:: http://postageapp.com/doc
 
 This is the developer plug-in for Postage.
@@ -31,7 +31,6 @@ Just add the following to your config file:
 
   ActionMailer::Base.delivery_method = :postage
   
-
 == Recipient override
 
 When developing an application it is often useful to override the list of recipients with your own email. 
@@ -39,20 +38,17 @@ this way you'll avoid sending emails to real people when you're developing your 
 
 To do this just add the following line to your development.rb file:
 
-  PostageMailer::Config.recipients = 'my_email@somewhere.com'
+  Postage.config.force_recipient = 'my_email@somewhere.com'
 
 You can also pass an array of emails if you need to:
   
-  PostageMailer::Config.recipients = ['me@somewhere.com', 'you@somewhere.com']
-
+  Postage.config.force_recipient = %w[ me@somewhere.com you@somewhere.com ]
 
 == Rails usage
   
 Postage integrates seamlessly with Rails. Only a few minor changes are needed when assembling your emails.
 
 You can create your email views and layouts the same way you usually do.
-
-
 
 === Sending one single email
 
@@ -62,9 +58,9 @@ To send a single email you don't have to change anything on your typical Mailer 
   
     def forgot_password(user)
       # Typical mail setup stuff
-      @recipients        = user.email
-      @from              = 'my_email@me.com'
-      @subject           = 'You have requested a new password'
+      @recipients = user.email
+      @from = 'my_email@me.com'
+      @subject = 'You have requested a new password'
       @body[:first_name] = user.first_name
       headers("Reply-to" => @from)
     end
@@ -79,11 +75,9 @@ Your HTML view also look the same as usual:
 
   <p>Regards,</p>
   
-
 To send all those emails you do, as usual:
 
   UserMailer::deliver_forgot_password(user)
-
   
 === Mass mailing for all!
 
@@ -92,8 +86,8 @@ To send multiple emails in one go, Postage uses substitution variables that look
 If you wanted to use a substitution variable called <tt>{{first_name}}</tt>, you would have to build a structure similar to:
 
   @recipients => {
-    'user_1@test.com' => {:first_name => 'User 1'},
-    'user_2@test.com' => {:first_name => 'User 2'},
+    'user_1@test.com' => { :first_name => 'User 1' },
+    'user_2@test.com' => { :first_name => 'User 2' },
     'user_3@test.com' => ...
     .
     .
@@ -104,21 +98,19 @@ So, let's say that you want to send personalized invitations to a bunch of peopl
 Our UserMailer now looks a bit different since we need to collect the first name of each user. Notice that we are using a <tt>{{first_name}}</tt> substitution variable on the subject.
 
   class UserMailer < ActionMailer::Base
-
     def event_invitation(users, event)
       # Typical mail setup stuff
-      @from              = options[:from] ? options[:from] : FROM_EMAIL
-      @subject           = "{{first_name}}, you have been invited to #{event.name}"
+      @from = options[:from] ? options[:from] : FROM_EMAIL
+      @subject = "{{first_name}}, you have been invited to #{event.name}"
       @body[:first_name] = user.first_name
       headers("Reply-to" => @from)
       
       # Collecting Postage data
-      @recipients = {}
+      @recipients = { }
       users.each do |user|
-        @recipients[user.email] = {:first_name => user.first_name}
+        @recipients[user.email] = { :first_name => user.first_name }
       end
     end
-  
   end
 
 And here's how the HTML view looks like. Notice that we're using the <tt>{{first_name}}</tt> substitution variable here too.
@@ -129,12 +121,8 @@ And here's how the HTML view looks like. Notice that we're using the <tt>{{first
 
   <p>Regards,</p>
 
-
 To send all those emails you do, as usual:
 
   UserMailer::deliver_event_invitation(users, event)
 
-
-
-
-(C) 2009 The Working Group Inc. ( http://www.twg.ca/ )
+(C) 2009 {The Working Group, Inc}[http://www.twg.ca/]
