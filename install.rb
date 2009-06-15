@@ -44,7 +44,7 @@ unless (missing_gems.empty?)
   puts ""
   puts "  The missing gems can usually be installed with:"
   puts ""
-  puts "     % sudo gem install #{missing_gems}"
+  puts "     % sudo gem install #{missing_gems * ' '}"
 end
 
 puts ""
