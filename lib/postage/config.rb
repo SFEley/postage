@@ -31,7 +31,7 @@ class Postage
     
     # Returns the default path to the configuration file
     def self.default_config_file_path
-      config_file_found or CONFIG_FILES.first
+      config_file_path or CONFIG_FILES.first
     end
     
     # == Instance Methods ===================================================
