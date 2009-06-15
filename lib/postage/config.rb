@@ -2,17 +2,19 @@ class Postage
   class Config
     # == Constants ==========================================================
     
+     BASE_PATH = Rails.root rescue RailsEnvironment.default.root
+    
     DEFAULT_HOSTNAME = 'http://postageapp.com'.freeze
     CONFIG_FILES = [
-      "#{Rails.root}/config/postage.yml",
-      "#{Rails.root}/config/postage.yaml",
-      "#{Rails.root}/config/postageapp.yml",
-      "#{Rails.root}/config/postageapp.yaml"
+      "#{BASE_PATH}/config/postage.yml",
+      "#{BASE_PATH}/config/postage.yaml",
+      "#{BASE_PATH}/config/postageapp.yml",
+      "#{BASE_PATH}/config/postageapp.yaml"
     ].freeze
 
     DEFAULT_CONFIGURATION = {
       :url => DEFAULT_HOSTNAME,
-      :queue_path => "#{Rails.root}/tmp/postage",
+      :queue_path => "#{BASE_PATH}/tmp/postage",
       :api_format => :json
     }.freeze
 
@@ -32,6 +34,12 @@ class Postage
     # Returns the default path to the configuration file
     def self.default_config_file_path
       config_file_path or CONFIG_FILES.first
+    end
+    
+    def self.environment
+      Rails.env
+    rescue
+      ENV['RAILS_ENV'] || 'development'
     end
     
     # == Instance Methods ===================================================
@@ -75,7 +83,7 @@ class Postage
         fh.puts *[
           "defaults: &defaults",
           @env_config.collect { |k,v| "  #{k}: #{v}" },
-          "#{Rails.env}:",
+          "#{self.class.environment}:",
           "  <<: *defaults"
         ].flatten
       end

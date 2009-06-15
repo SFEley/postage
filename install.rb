@@ -1,10 +1,18 @@
+#
+# Postage plugin installation script
+#
+
 $LOAD_PATH << File.join(File.dirname(__FILE__), 'lib')
 
 require 'postage'
 
+# -- Configuration ----------------------------------------------------------
+
 unless (Postage.config.exists?)
   Postage.config.create!
 end
+
+# -- Announcement -----------------------------------------------------------
 
 puts "==========================================================================="
 puts "  Postage plugin successfully installed"
@@ -50,5 +58,3 @@ puts ""
 puts "==========================================================================="
 puts "  http://postageapp.com/"
 puts "==========================================================================="
-
-true
