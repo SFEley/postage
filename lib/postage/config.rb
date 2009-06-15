@@ -52,7 +52,7 @@ class Postage
       
       @file_path = self.class.config_file_path
       
-      @env_config = DEFAULT_CONFIGURATION
+      @env_config = { }.merge(DEFAULT_CONFIGURATION)
       
       begin
         @config = YAML.load(File.open(@file_path))
