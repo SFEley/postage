@@ -47,7 +47,9 @@ class Postage
     # Creates a new Postage::Configuration instance by reading from the
     # configuration file.
     # +env+ The Rails environment to load
-    def initialize(env)
+    def initialize(env = nil)
+      env ||= self.class.environment
+      
       @file_path = self.class.config_file_path
       
       @env_config = DEFAULT_CONFIGURATION
