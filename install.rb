@@ -33,7 +33,7 @@ required_gems.each do |gem_name|
     gem gem_name
     
     found = true
-  rescue
+  rescue Gem::LoadError
     missing_gems << gem_name
   end
   
