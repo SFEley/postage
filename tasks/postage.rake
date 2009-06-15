@@ -23,8 +23,10 @@ namespace :postage do
     if (entries.empty?)
       puts "Queue empty."
     else
-      entries.each do |entry|
-        puts "%30s %16s" % [ Time.at(entry[0].to_i).to_s, entry[3] ]
+      entries.sort.each do |entry|
+        puts "%30s %-16s" % [ Time.at(entry[0].to_i).to_s, entry[3] ]
+        puts "\t%s" % (entry[5].blank? ? 'No exception reported' : entry[5])
+        puts "\t%s" % entry[6] if (entry[6])
       end
     end
   end

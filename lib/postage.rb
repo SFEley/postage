@@ -64,7 +64,19 @@ class Postage
     Dir.entries(config.queue_path).select do |file|
       file.match(/\.yaml$/)
     end.collect do |file|
-      file.split(/\./)
+      path = File.join(config.queue_path, file)
+      reason = nil
+      url = nil
+
+      begin
+        fh = open(path)
+        reason = fh.readline.sub(/^#\s*/, '').chomp
+        url = fh.readline.sub(/^#\s*/, '').chomp
+      rescue
+        reason = "ERROR: Could not open #{path}"
+      end
+
+      file.split(/\./) << reason << url
     end
   end
   
@@ -110,6 +122,7 @@ class Postage
 protected
   def api_call(action, params = nil)
     make_reliable_post(
+      action,
       "#{self.class.config.url}/api/#{@api_key}/#{action}.#{@api_format}",
       :headers => {
         'Content-Type' => "application/#{@api_format}"
@@ -120,11 +133,11 @@ protected
     )
   end
   
-  def make_reliable_post(action, params)
-    self.class.post(action, params)
+  def make_reliable_post(action, url, params)
+    self.class.post(url, params)
   rescue Timeout::Error, Exception => e
     # Timeout on connection
-    save_to_queue(action, "\##{e}\n" + [ action, params ].to_yaml)
+    save_to_queue(action, "\# Exception: #{e.class} (#{e})\n\# #{url}\n" + [ url, params ].to_yaml)
   end
   
   def save_to_queue(action, content = nil)
