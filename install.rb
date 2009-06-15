@@ -1,3 +1,5 @@
+require 'postage'
+
 unless (Postage.config.exists?)
   Postage.config.create!
 end

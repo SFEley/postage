@@ -45,9 +45,14 @@ class Postage
   end
   
   # == Extensions ===========================================================
-  
-  include HTTParty
-  format :json
+
+  # Installation procedure requires a functional Postage class even if
+  # HTTParty is not loaded properly.
+  begin
+    include HTTParty
+    format :json
+  rescue
+  end
   
   # == Class Methods ========================================================
   
