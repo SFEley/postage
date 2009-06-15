@@ -84,9 +84,10 @@ class Postage
       open(@file_path, 'w') do |fh|
         fh.puts *[
           "defaults: &defaults",
-          @env_config.collect { |k,v| "  #{k}: #{v}" },
+          "  \# Keys defined here will be loaded by default into all environments",
           "#{self.class.environment}:",
-          "  <<: *defaults"
+          "  \# Register your project with http://postageapp.com/ for a valid API key",
+          "  api_key: INSERT_VALID_API_KEY_HERE"
         ].flatten
       end
     end
