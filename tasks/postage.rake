@@ -1,10 +1,18 @@
 namespace :postage do
   desc "Show Postage configuration"
   task :config => :environment do
-    puts "Postage configuration [#{Rails.env}]"
+    puts "Postage configuration [#{Rails.env}] #{Postage.config.file_path}"
+    
+    config = Postage.config.to_h
 
-    Postage.config.keys.each do |key|
-      puts "  #{key}=#{Postage.config[key]}"
+    config.keys.each do |key|
+      puts "  #{key}: #{config[key]}"
+    end
+    
+    if (Postage.config.default_api_key?)
+      puts ""
+      puts "  * ERROR: Configuration file is not using a valid API key"
+      puts "  * A valid key can be obtained from #{Postage.config.url}"
     end
   end
   
@@ -17,7 +25,9 @@ namespace :postage do
     
     if (result['error'])
       puts "Error: #{result['error']['message']}"
-      puts "NOTE: Run rake:config to see the configuration being used"
+      puts ""
+      puts "NOTE:"
+      puts "  * Run rake postage:config to see the configuration being used"
     else
       if (result['project'])
         puts "Project URL: #{result['project']['href']}"

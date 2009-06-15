@@ -2,19 +2,21 @@ class Postage
   class Config
     # == Constants ==========================================================
     
-     BASE_PATH = Rails.root rescue RailsEnvironment.default.root
+    BASE_PATH = Rails.root rescue RailsEnvironment.default.root
+    
+    DEFAULT_API_KEY = 'INSERT_VALID_API_KEY_HERE'.freeze
     
     DEFAULT_HOSTNAME = 'http://postageapp.com'.freeze
     CONFIG_FILES = [
-      "#{BASE_PATH}/config/postage.yml",
-      "#{BASE_PATH}/config/postage.yaml",
-      "#{BASE_PATH}/config/postageapp.yml",
-      "#{BASE_PATH}/config/postageapp.yaml"
+      File.join(BASE_PATH, 'config', 'postage.yml'),
+      File.join(BASE_PATH, 'config', 'postage.yaml'),
+      File.join(BASE_PATH, 'config', 'postageapp.yml'),
+      File.join(BASE_PATH, 'config', 'postageapp.yaml')
     ].freeze
 
     DEFAULT_CONFIGURATION = {
       :url => DEFAULT_HOSTNAME,
-      :queue_path => "#{BASE_PATH}/tmp/postage",
+      :queue_path => File.join(BASE_PATH, 'tmp', 'postage')
       :api_format => :json
     }.freeze
 
@@ -86,8 +88,8 @@ class Postage
           "defaults: &defaults",
           "  \# Keys defined here will be loaded by default into all environments",
           "#{self.class.environment}:",
-          "  \# Register your project with http://postageapp.com/ for a valid API key",
-          "  api_key: INSERT_VALID_API_KEY_HERE"
+          "  \# Register your project with #{DEFAULT_HOSTNAME}/ for a valid API key",
+          "  api_key: #{DEFAULT_API_KEY}"
         ].flatten
       end
     end
@@ -95,8 +97,8 @@ class Postage
     # -- Accessors and Mutators ---------------------------------------------
     
     # Returns the base URL used for API calls
-    def url
-      @env_config[:url]
+    def url(path = nil)
+      @env_config[:url] + path.to_s
     end
 
     def url=(value)
@@ -110,6 +112,10 @@ class Postage
 
     def api_key=(value)
       @env_config[:api_key] = value.to_s
+    end
+    
+    def default_api_key?
+      self.api_key == DEFAULT_API_KEY
     end
 
     # Returns the format used for API calls.
@@ -147,6 +153,14 @@ class Postage
     # if no file was loaded
     def file_path
       @file_path
+    end
+    
+    def to_h
+      @env_config
+    end
+    
+    def inspect
+      @env_config.inspect
     end
   end
 end
