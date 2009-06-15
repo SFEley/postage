@@ -1,4 +1,4 @@
-unless (Postage.config.exist?)
+unless (Postage.config.exists?)
   Postage.config.create!
 end
 
