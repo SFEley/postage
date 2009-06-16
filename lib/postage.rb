@@ -132,7 +132,7 @@ class Postage
     
     @api_key = @config.api_key
     @api_format = @config.api_format
-    @force_recipient = @config.api_format
+    @force_recipient = @config.force_recipient
   end
   
   def test
