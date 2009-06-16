@@ -124,5 +124,26 @@ And here's how the HTML view looks like. Notice that we're using the <tt>{{first
 To send all those emails you do, as usual:
 
   UserMailer::deliver_event_invitation(users, event)
+  
+== Rake tasks
+
+There are several Rake tasks to test and use Postage within a Rails application.
+
+To have a look at the current configuration based on the Rails environment:
+
+  rake postage:config
+
+To test that the configuration file is correctly installed and the API key is valid:
+
+  rake postage:test
+
+To see what transactions have failed to be sent to Postage and are saved in a local
+store:
+
+  rake postage:queue
+  
+To attempt delivery of the locally queued items:
+
+  rake postage:retry
 
 (C) 2009 {The Working Group, Inc}[http://www.twg.ca/]
