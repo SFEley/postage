@@ -16,8 +16,14 @@ puts "==========================================================================
 puts ""
 
 unless (Postage.config.exists?)
-  puts "  No configuration file found, so generating an example one."
-  Postage.config.create!
+  puts "  No configuration file found."
+  
+  begin
+    Postage.config.create!
+  rescue Postage::Exception => e
+    puts ""
+    puts "  ERROR: #{e.to_s}"
+  end
   puts ""
 end
 

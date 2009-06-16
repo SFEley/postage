@@ -27,21 +27,29 @@ class Postage
     # == Class Methods ======================================================
 
     # :nodoc:
-    def self.config_file_path
+    def self.file_path
       CONFIG_FILES.find do |path|
         File.exist?(path)
       end
     end
     
+    def self.exists?
+      !!file_path
+    end
+    
     # Returns the default path to the configuration file
     def self.default_config_file_path
-      config_file_path or CONFIG_FILES.first
+      file_path or CONFIG_FILES.first
     end
     
     def self.environment
       Rails.env
     rescue
       ENV['RAILS_ENV'] || 'development'
+    end
+    
+    def self.create!
+      new.create!
     end
     
     # == Instance Methods ===================================================
@@ -52,7 +60,7 @@ class Postage
     def initialize(env = nil)
       env ||= self.class.environment
       
-      @file_path = self.class.config_file_path
+      @file_path = self.class.file_path
       
       @env_config = { }.merge(DEFAULT_CONFIGURATION)
       
@@ -60,11 +68,12 @@ class Postage
         @config = YAML.load(File.open(@file_path))
 
         [ @config['defaults'], @config[env] ].compact.each do |options|
-          @env_config = @env_config.merge(options.symbolize_keys)
+          # NOTE: Hash#symbolize_keys not present during install phase
+          @env_config = @env_config.merge(options.inject({ }) { |h, (k, v)| h[k.to_sym] = v; h })
         end
       rescue => e
+        @file_path = self.class.default_config_file_path
         @config_exception = e.to_s
-        @file_path = nil
       end
       
       # Convert some options to Symbol from String
@@ -76,12 +85,13 @@ class Postage
     # Will return +true+ if a configuration file was found and loaded, or
     # +false+ otherwise.
     def exists?
-      !!@file_path
+      File.exists?(@file_path)
     end
     
     # Creates the configuration file with standard defaults defined.
     def create!
       @file_path = self.class.default_config_file_path
+      puts "CREATE: #{@file_path}"
       
       open(@file_path, 'w') do |fh|
         fh.puts *[
@@ -92,6 +102,8 @@ class Postage
           "  api_key: #{DEFAULT_API_KEY}"
         ].flatten
       end
+    rescue Errno::EACCES
+      raise Postage::Exception, "Could not create configuration file #{@file_path}"
     end
     
     # -- Accessors and Mutators ---------------------------------------------
@@ -161,6 +173,10 @@ class Postage
     
     def inspect
       @env_config.inspect
+    end
+    
+    def read_exception
+      @config_exception
     end
   end
 end
