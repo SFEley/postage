@@ -8,16 +8,19 @@ require 'postage'
 
 # -- Configuration ----------------------------------------------------------
 
-unless (Postage.config.exists?)
-  Postage.config.create!
-end
-
 # -- Announcement -----------------------------------------------------------
 
 puts "==========================================================================="
 puts "  Postage plugin successfully installed"
 puts "==========================================================================="
 puts ""
+
+unless (Postage.config.exists?)
+  puts "  No configuration file found, so generating an example one."
+  Postage.config.create!
+  puts ""
+end
+
 puts "  Check the configuration file and make any changes as required:"
 puts ""
 puts "     #{Postage.config.file_path}"
