@@ -80,7 +80,7 @@ class Postage
         reason = "ERROR: Could not open #{path}"
       end
 
-      file.split(/\./) << reason << url
+      [ file, reason, url ]
     end
   end
   
@@ -178,7 +178,7 @@ protected
   
   def make_reliable_post(action, url, params)
     self.class.post(url, params)
-  rescue Timeout::Error, Exception => e
+  rescue HTTParty::Parsers::JSON::ParseError, Timeout::Error, Exception => e
     # Timeout on connection
     save_to_queue(action, "\# Exception: #{e.class} (#{e})\n\# #{url}\n" + [ url, params ].to_yaml)
   end

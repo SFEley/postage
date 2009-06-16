@@ -24,9 +24,10 @@ namespace :postage do
       puts "Queue empty."
     else
       entries.sort.each do |entry|
-        puts "%30s %-16s" % [ Time.at(entry[0].to_i).to_s, entry[3] ]
-        puts "\t%s" % (entry[5].blank? ? 'No exception reported' : entry[5])
-        puts "\t%s" % entry[6] if (entry[6])
+        spec = entry[0].split(/\./)
+        puts "%s [%s] %-16s" % [ entry[0], Time.at(spec[0].to_i).to_s, spec[3] ]
+        puts "\t%s" % (entry[1].blank? ? 'No exception reported' : entry[1])
+        puts "\t%s" % entry[2] if (entry[2])
       end
     end
   end
