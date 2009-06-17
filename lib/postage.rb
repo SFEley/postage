@@ -112,11 +112,9 @@ class Postage
           puts "\tSent."
         end
       rescue Timeout::Error, Exception => e
-        STDERR.puts(e.to_s)
         # Skip for now, can't finish
       rescue => e
-        STDERR.puts(e.to_s)
-        # YAML-related errors
+        # YAML or file-system related errors
       ensure
         file.flock(File::LOCK_UN)
       end
@@ -133,6 +131,8 @@ class Postage
     @api_key = @config.api_key
     @api_format = @config.api_format
     @force_recipient = @config.force_recipient
+    
+    @errors = [ ]
   end
   
   def test
@@ -162,25 +162,42 @@ class Postage
     self.api_call(:send_message, :arguments => arguments)
   end
   
+  def errors?
+    !@errors.empty?
+  end
+  
+  def errors
+    @errors
+  end
+  
 protected
   def api_call(action, params = nil)
-    make_reliable_post(
-      action,
-      "#{self.class.config.url}/api/#{@api_key}/#{action}.#{@api_format}",
-      :headers => {
-        'Content-Type' => "application/#{@api_format}"
-      },
-      :body => encode_params(params, @api_format),
-      :format => @api_format,
-      :timeout => 2
+    Postage::Result.new(
+      make_reliable_post(
+        action,
+        "#{self.class.config.url}/api/#{@api_key}/#{action}.#{@api_format}",
+        :headers => {
+          'Content-Type' => "application/#{@api_format}"
+        },
+        :body => encode_params(params, @api_format),
+        :format => @api_format,
+        :timeout => 2
+      )
     )
   end
   
   def make_reliable_post(action, url, params)
     self.class.post(url, params)
-  rescue HTTParty::Parsers::JSON::ParseError, Timeout::Error, Exception => e
+  rescue HTTParty::Parsers::JSON::ParseError, Timeout::Error, SocketError, Exception => e
     # Timeout on connection
-    save_to_queue(action, "\# Exception: #{e.class} (#{e})\n\# #{url}\n" + [ url, params ].to_yaml)
+    error_message = "\# Exception: #{e.class} (#{e})\n\# #{url}\n" + [ url, params ].to_yaml
+    
+    save_to_queue(action, error_message)
+    
+    { 
+      :response => 'error',
+      :error => error_message
+    }
   end
   
   def save_to_queue(action, content = nil)
