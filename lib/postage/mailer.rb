@@ -1,7 +1,9 @@
-# These methods are imported into ActionMailer::Base by the plugin init.rb
+# These methods are imported into ActionMailer::Base by init.rb
 
 class Postage
   module Mailer
+    # == Include Hook =======================================================
+
     def self.included(base)
       base.send(:include, InstanceMethods)
     end
@@ -38,7 +40,7 @@ class Postage
           end
         end
         
-        Postage.new.send_message(
+        Postage.end_message(
           arguments[:parts],
           self.recipients,
           { },

@@ -24,10 +24,13 @@ namespace :postage do
       puts "Queue empty."
     else
       entries.sort.each do |entry|
-        spec = entry[0].split(/\./)
-        puts "%s [%s] %-16s" % [ entry[0], Time.at(spec[0].to_i).to_s, spec[3] ]
-        puts "\t%s" % (entry[1].blank? ? 'No exception reported' : entry[1])
-        puts "\t%s" % entry[2] if (entry[2])
+        file = entry.shift
+        spec = file.split(/\./)
+        puts "%s [%s] %-16s" % [ file, Time.at(spec[0].to_i).to_s, spec[2] ]
+        
+        entry.each do |note|
+          puts "\t#{note}"
+        end
       end
     end
   end
@@ -42,16 +45,17 @@ namespace :postage do
     puts "Testing Postage configuration for #{Rails.env}"
     
     Postage.config.exists?
-    result = Postage.new.test
+    response = Postage.test.response
     
-    if (result['error'])
-      puts "Error: #{result['error']['message']}"
+    if (response.error?)
+      puts "Error: #{response.error}"
       puts ""
       puts "NOTE:"
       puts "  * Run rake postage:config to see the configuration being used"
     else
-      if (result['project'])
-        puts "Project URL: #{result['project']['href']}"
+      if (response.project?)
+        puts "Project Name: #{response.project_name}"
+        puts "Project URL: #{response.project_href}"
       else
         puts "No project information retrieved."
       end

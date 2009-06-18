@@ -1,6 +1,12 @@
-require 'fileutils'
+# Gem Dependencies
 
 gem 'httparty'
+
+# Standard Libraries
+
+require 'fileutils'
+
+# Custom Library
 
 require 'postage'
 

@@ -14,48 +14,38 @@
 # Copyright:: Copyright (c) 2009 The Working Group Inc.
 # License:: Distributes under the same terms as Ruby
 
-# http://e-huned.com/2009/06/11/monkey-patch-httparty-to-use-a-timeout/
-module HTTParty
-  class Request
-  private
-    def http
-      http = Net::HTTP.new(uri.host, uri.port, options[:http_proxyaddr], options[:http_proxyport])
-      http.use_ssl = (uri.port == 443)
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      http.open_timeout = http.read_timeout = options[:timeout].to_i if (options[:timeout].to_i > 0)
-      http
-    end
-  end
-end
-
 class Postage
   # == Autoload =============================================================
   
   autoload(:Config, 'postage/config')
   autoload(:Mailer, 'postage/mailer')
+  autoload(:Response, 'postage/response')
+  autoload(:Result, 'postage/result')
 
   # == Constants ============================================================
   
-  POSTAGE_API_VERSION = '0.1.0'
-  VERSION = '0.2.0'
+  POSTAGE_API_VERSION = '0.2.0'
+  VERSION = '0.2.1'
+
+  UNIQUE_ID_LETTERS = [ ('a'..'z'), ('A'..'Z'), ('0'..'9') ].collect do |c|
+    c.collect 
+  end.flatten.freeze
+
+  UNIQUE_ID_LETTERS_COUNT = UNIQUE_ID_LETTERS.length
 
   # == Utility Classes ======================================================
 
   class Exception < ::Exception
   end
   
-  # == Extensions ===========================================================
-
-  # Installation procedure requires a functional Postage class even if
-  # HTTParty is not loaded properly.
-  begin
-    include HTTParty
-    format :json
-  rescue
-  end
-  
   # == Class Methods ========================================================
   
+  def self.generate_unique_id(length = 20)
+    (1..length).collect do
+      UNIQUE_ID_LETTERS[ActiveSupport::SecureRandom.random_number(UNIQUE_ID_LETTERS_COUNT)]
+    end.to_s
+  end
+
   def self.config
     @config ||= Config.new
   end
@@ -66,21 +56,39 @@ class Postage
     end
   end
   
+  def self.queue!(filename, content = nil)
+    queue_path = config.queue_path
+
+    unless (File.exist?(queue_path))
+      FileUtils.mkdir_p(queue_path)
+    end
+    
+    open(File.join(queue_path, filename), 'w') do |fh|
+      fh.write(content) if (content)
+      yield(fh) if (block_given?)
+    end
+  end
+  
   def self.queue
     queued_transactions.collect do |file|
       path = File.join(config.queue_path, file)
-      reason = nil
-      url = nil
+      info = [ file ]
 
       begin
         fh = open(path)
-        reason = fh.readline.sub(/^#\s*/, '').chomp
-        url = fh.readline.sub(/^#\s*/, '').chomp
+        
+        while (line = fh.readline) do
+          if (line.match(/^#/))
+            info << line.sub(/\#\s*/, '').chomp
+          else
+            break
+          end
+        end
       rescue
-        reason = "ERROR: Could not open #{path}"
+        reason = "Error: Could not open #{path}"
       end
-
-      [ file, reason, url ]
+      
+      info
     end
   end
   
@@ -102,44 +110,26 @@ class Postage
         end
 
         if (locked)
-          params = YAML.load(open(path))
+          request = Request.load(path)
 
-          puts "\tPosting to #{params.first}"
-          post(*params)
-        
-          File.unlink(path)
-
-          puts "\tSent."
+          response = request.post!
+          
+          if (response.error?)
+            puts "\tFailed: #{response.error}"
+          else
+            File.unlink(path)
+            puts "\tSent."
+          end
         end
       rescue Timeout::Error, Exception => e
         # Skip for now, can't finish
-      rescue => e
-        # YAML or file-system related errors
       ensure
         file.flock(File::LOCK_UN)
       end
     end
   end
   
-  # == Instance Methods =====================================================
-
-  # An instance of Postage may be created with options that override those
-  # found in the configuration file.
-  def initialize(config = nil)
-    @config = config || self.class.config
-    
-    @api_key = @config.api_key
-    @api_format = @config.api_format
-    @force_recipient = @config.force_recipient
-    
-    @errors = [ ]
-  end
-  
-  def test
-    self.api_call(:project_info)
-  end
-  
-  def send_message(message, recipients, variables = nil, headers = nil)
+  def self.send_message(message, recipients, variables = nil, headers = nil)
     arguments = {
       :recipients => recipients
     }
@@ -154,76 +144,17 @@ class Postage
     arguments[:variables] = variables unless (variables.blank?)
     arguments[:headers] = headers unless (headers.blank?)
     
-    if (@force_recipient)
+    if (config.force_recipient)
       arguments[:transmission] ||= { }
-      arguments[:transmission][:recipient] = @force_recipient
+      arguments[:transmission][:recipient] = config.force_recipient
     end
 
-    self.api_call(:send_message, :arguments => arguments)
+    Postage::Request.new(:send_message, arguments).call!
   end
-  
-  def errors?
-    !@errors.empty?
-  end
-  
-  def errors
-    @errors
-  end
-  
-protected
-  def api_call(action, params = nil)
-    Postage::Result.new(
-      make_reliable_post(
-        action,
-        "#{self.class.config.url}/api/#{@api_key}/#{action}.#{@api_format}",
-        :headers => {
-          'Content-Type' => "application/#{@api_format}"
-        },
-        :body => encode_params(params, @api_format),
-        :format => @api_format,
-        :timeout => 2
-      )
-    )
-  end
-  
-  def make_reliable_post(action, url, params)
-    self.class.post(url, params)
-  rescue HTTParty::Parsers::JSON::ParseError, Timeout::Error, SocketError, Exception => e
-    # Timeout on connection
-    error_message = "\# Exception: #{e.class} (#{e})\n\# #{url}\n" + [ url, params ].to_yaml
-    
-    save_to_queue(action, error_message)
-    
-    { 
-      :response => 'error',
-      :error => error_message
-    }
-  end
-  
-  def save_to_queue(action, content = nil)
-    queue_path = self.class.config.queue_path
-    
-    FileUtils.mkdir_p(queue_path) unless (File.exist?(queue_path))
-    
-    open(File.join(queue_path, "%.9f.%06d.%s.yaml" % [ Time.now.to_f, $$, action ]), 'w') do |fh|
-      fh.write(content) if (content)
-      yield(fh) if (block_given?)
-    end
-  end
-  
-  def encode_params(hash, api_format = :yaml)
-    return '' unless (hash)
-    
-    case (api_format)
-    when :xml
-      name = hash.keys.first.to_s
-      data = hash.values.first
 
-      data.to_xml(:root => name, :type => 'hash')
-    when :yaml
-      hash.to_yaml
-    else
-      hash.to_json
-    end
+  def self.test
+    Postage::Request.new(:project_info).call!
   end
+
+  # == Instance Methods =====================================================
 end
