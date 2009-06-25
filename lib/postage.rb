@@ -46,7 +46,8 @@ class Postage
     end.to_s
   end
 
-  def self.config
+  def self.config(reload = false)
+    @config = nil if (reload)
     @config ||= Config.new
   end
   

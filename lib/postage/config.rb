@@ -31,9 +31,14 @@ class Postage
 
     # :nodoc:
     def self.file_path
-      CONFIG_FILES.find do |path|
-        File.exist?(path)
-      end
+      @file_path ||=
+        CONFIG_FILES.find do |path|
+          File.exist?(path)
+        end
+    end
+
+    def self.file_path=(path)
+      @file_path = path.to_s
     end
 
     # Returns +true+ if the configuration file exists.
