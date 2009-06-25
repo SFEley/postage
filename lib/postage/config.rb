@@ -1,6 +1,7 @@
 class Postage
   class Config
-    # == Constants ==========================================================
+    # =======================================================================
+    # :section: Constants
     
     BASE_PATH = Rails.root rescue RailsEnvironment.default.root
     
@@ -20,11 +21,13 @@ class Postage
       :api_format => :json
     }.freeze
 
-    # == Properties =========================================================
+    # =======================================================================
+    # :section: Properties
     
     attr_reader :file_path
     
-    # == Class Methods ======================================================
+    # =======================================================================
+    # :section: Class Methods 
 
     # :nodoc:
     def self.file_path
@@ -32,31 +35,35 @@ class Postage
         File.exist?(path)
       end
     end
-    
+
+    # Returns +true+ if the configuration file exists.
     def self.exists?
       !!file_path
     end
     
-    # Returns the default path to the configuration file
+    # Returns the default path to the configuration file.
     def self.default_config_file_path
       file_path or CONFIG_FILES.first
     end
     
+    # Returns the current Rails environment.
     def self.environment
       Rails.env
     rescue
       ENV['RAILS_ENV'] || 'development'
     end
     
+    # Creates a configuration file with safe defaults
     def self.create!
       new.create!
     end
     
-    # == Instance Methods ===================================================
+    # =======================================================================
+    # :section: Instance Methods
 
     # Creates a new Postage::Configuration instance by reading from the
     # configuration file.
-    # +env+ The Rails environment to load
+    # * +env+ is the Rails environment to load.
     def initialize(env = nil)
       env ||= self.class.environment
       
@@ -106,13 +113,15 @@ class Postage
       raise Postage::Exception, "Could not create configuration file #{@file_path}"
     end
     
-    # -- Accessors and Mutators ---------------------------------------------
+    # -----------------------------------------------------------------------
+    # == Accessors and Mutators
     
     # Returns the base URL used for API calls
     def url(path = nil)
       @env_config[:url] + path.to_s
     end
 
+    # :nodoc:
     def url=(value)
       @env_config[:url] = value.to_s
     end
@@ -122,10 +131,12 @@ class Postage
       @env_config[:api_key]
     end
 
+    # :nodoc:
     def api_key=(value)
       @env_config[:api_key] = value.to_s
     end
     
+    # Returns +true+ if using the default API key, +false+ otherwise.
     def default_api_key?
       self.api_key == DEFAULT_API_KEY
     end
@@ -135,16 +146,18 @@ class Postage
       @env_config[:api_format]
     end
 
+    # :nodoc:
     def api_key=(value)
       @env_config[:api_format] = value.to_s
     end
     
     # Returns an array of the recipient(s) the message will be sent to,
-    # regardless of original destination or nil if this is not defined.
+    # regardless of original destination or +nil+ if this is not defined.
     def force_recipient
       @env_config[:force_recipient]
     end
 
+    # :nodoc:
     def force_recipient=(values)
       values = [ values ].flatten.collect(&:to_s)
    
@@ -157,24 +170,29 @@ class Postage
       @env_config[:queue_path]
     end
 
+    # :nodoc:
     def queue_path=(value)
       @env_config[:queue_path] = value.to_s
     end
 
-    # Returns the path of the configuration file that was loaded, or nil
+    # Returns the path of the configuration file that was loaded, or +nil+
     # if no file was loaded
     def file_path
       @file_path
     end
     
+    # Returns the configuration as a Hash with Symbol keys.
     def to_h
       @env_config
     end
     
+    # :nodoc:
     def inspect
       @env_config.inspect
     end
     
+    # Returns any exception encountered when the configuration file was read or
+    # +nil+ if no exception occurred.
     def read_exception
       @config_exception
     end

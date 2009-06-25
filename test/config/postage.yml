@@ -1,0 +1,13 @@
+defaults: &defaults
+  api_key: DEFAULT_API_KEY
+
+development:
+  url: http://postageapp.dev
+  api_key: DEVELOPMENT_API_KEY
+
+test:
+  url: http://postageapp.test
+  api_key: TEST_API_KEY
+
+production:
+  api_key: PRODUCTION_API_KEY
