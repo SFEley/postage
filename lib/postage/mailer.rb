@@ -40,7 +40,7 @@ class Postage
           end
         end
         
-        Postage.end_message(
+        Postage.send_message(
           arguments[:parts],
           self.recipients,
           { },
