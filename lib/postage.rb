@@ -21,11 +21,12 @@ class Postage
   autoload(:Mailer, 'postage/mailer')
   autoload(:Response, 'postage/response')
   autoload(:Result, 'postage/result')
+  autoload(:Request, 'postage/request')
 
   # == Constants ============================================================
   
   POSTAGE_API_VERSION = '0.2.0'
-  VERSION = '0.2.1'
+  VERSION = '0.2.2'
 
   UNIQUE_ID_LETTERS = [ ('a'..'z'), ('A'..'Z'), ('0'..'9') ].collect do |c|
     c.collect 
