@@ -88,7 +88,7 @@ class Postage
           )
         )
       end
-    rescue HTTParty::Parsers::JSON::ParseError, Timeout::Error, SocketError, Exception => e
+    rescue Timeout::Error, SocketError, Exception => e
       error_message = "#{e.class} (#{e})"
       @error = "Exception: #{error_message}"
     
