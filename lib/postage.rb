@@ -84,4 +84,3 @@ module Postage
   end
 end
 
-ActionMailer::Base.send :include, Postage::Mailer
