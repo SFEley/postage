@@ -34,8 +34,12 @@ class Postage::Request
   def call!
     Postage.log.info "Sending Request [UID: #{self.uid} URL: #{call_url}] \n#{self.arguments.inspect}\n"
     
-    self.arguments[:uid] = self.uid
-    self.arguments[:recipient_override] = Postage.recipient_override unless Postage.recipient_override.blank?
+    self.arguments[:uid]              = self.uid
+    self.arguments[:plugin_version]   = Postage::VERSION
+    
+    unless Postage.recipient_override.blank?
+      self.arguments[:recipient_override] = Postage.recipient_override
+    end
     
     Timeout::timeout(2) do
       self.response = self.class.post( call_url, 
