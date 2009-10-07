@@ -1,110 +1,56 @@
-class Postage
-  class Request
-    # == Constants ============================================================
+# Postage::Request.api_method maps to the possible actions on the PostageApp
+# current list is: get_method_list, get_project_info, send_message
 
-    # == Extensions ===========================================================
-
-    include HTTParty
-    format :json
-
-    # == Class Methods ========================================================
-    
-    def self.load(filename)
-      new(*YAML.load(open(filename)))
-    rescue => e
-      # YAML or file-system related errors
-    end
-
-    # == Instance Methods =====================================================
-    
-    def initialize(api_call, arguments = { })
-      @api_call = api_call
-      @arguments = arguments
-    end
-    
-    def unique_id
-      @unique_id ||= Postage.generate_unique_id
-    end
-    
-    def queue_file_name
-      "%d.%s.%s.yaml" % [ Time.now.to_i, unique_id, @api_call ]
-    end
-    
-    def error?
-      !!@error
-    end
-    
-    def error
-      @error
-    end
-    
-    def queued?
-      !!@queued
-    end
+class Postage::Request
   
-    def call_url
-      @call_url ||=
-        "#{Postage.config.url}/api/#{Postage.config.api_key}/#{@api_call}.#{Postage.config.api_format}"
-    end
-
-    def call!
-      Rails.logger.debug("Postage [#{unique_id}] API call to #{call_url}")
-      
-      @error = nil
-
-      @response = post!
-
-      if (@response.error?)
-        @error ||= "Error: #{response.error}"
-
-        Rails.logger.debug("Postage [#{unique_id}] #{call_url} #{@error}")
-
-        queue!
-      else
-        Rails.logger.debug("Postage [#{unique_id}] #{response.transmission_href or 'Success'}")
-      end
+  require 'httparty'
+  include HTTParty
+  format :json
   
-      self
-    end
+  HEADERS = {
+    'Content-type'             => 'application/json',
+    'Accept'                   => 'text/json, application/json',
+    'X-Postage-Client-Name'    => 'PostagePlugin',
+    'X-Postage-Client-Version' => Postage::VERSION
+  }
+  
+  attr_accessor :api_method,
+                :arguments,
+                :response
+  
+  def initialize(api_method, arguments = {})
+    @api_method = api_method
+    @arguments  = arguments || {}
+  end
+  
+  def call_url
+    "#{Postage.url}/api/#{Postage.api_key}/#{self.api_method}.json"
+  end
+  
+  def uid
+    @uid ||= Time.now.to_f.to_s
+  end
+  
+  def call!
+    Postage.log.info "Sending Request [UID: #{self.uid} URL: #{call_url}] \n#{self.arguments.inspect}\n"
     
-    def response
-      @response
-    end
-  
-    def to_yaml
-      [ @error ].compact.collect { |e| "# #{e}\n" }.to_s +
-        [ @api_call, @arguments ].to_yaml
-    end
-  
-    def post!
-      Timeout::timeout(2) do
-        Postage::Response.new(
-          self.class.post(
-            call_url,
-            :headers => {
-              'Content-Type' => "application/json"
-            },
-            :body => { :arguments => @arguments }.to_json
-          )
-        )
-      end
-    rescue Timeout::Error, SocketError, Exception => e
-      error_message = "#{e.class} (#{e})"
-      @error = "Exception: #{error_message}"
+    self.arguments[:uid] = self.uid
+    self.arguments[:recipient_override] = Postage.recipient_override unless Postage.recipient_override.blank?
     
-      Postage::Response.new(
-        :response => 'error',
-        :error => error_message
+    Timeout::timeout(2) do
+      self.response = self.class.post( call_url, 
+        :headers  => HEADERS,
+        :body     => { :arguments => self.arguments }.to_json
       )
     end
-
-  protected
-    def queue!
-      Postage.queue!(queue_file_name) do |queued|
-        queued.write(to_yaml)
-      end
-
-      @queued = true
-    end
+    
+    Postage.log.info "Received Response [UID: #{self.uid}] \n#{self.response.inspect}\n"
+    
+    HashWithIndifferentAccess.new(self.response)
+    
+  rescue Timeout::Error, SocketError, Exception => e
+    Postage.log.error "Failure [UID: #{self.uid}] \n#{e.inspect}"
+    nil # no response generated
   end
+  
 end

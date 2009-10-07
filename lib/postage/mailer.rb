@@ -1,52 +1,53 @@
-# These methods are imported into ActionMailer::Base by init.rb
+require 'base64'
 
-class Postage
-  module Mailer
-    # == Include Hook =======================================================
-
-    def self.included(base)
-      base.send(:include, InstanceMethods)
-    end
+module Postage::Mailer
   
-    # == Instance Methods ===================================================
+  def self.included(base)
+    Postage.log.info 'Preparing ActiveMailer to use postage delivery method'
+    base.send(:include, InstanceMethods)
+  end
 
-    module InstanceMethods
-      def perform_delivery_postage(mail)
-        arguments = {
-          :headers => {
-            'Subject' => self.subject, 
-            'From' => self.from
-          }.merge(self.headers),
-          :parts => { }
-        }
-
-        # Collect the parts
-        if (self.parts.blank?)
-          arguments[:parts][self.content_type] = self.body
-        else
-          self.parts.each do |part|
-            case (part.content_disposition)
-            when 'inline'
-              arguments[:parts][part.content_type] = part.body
-            when 'attachment'
-              require 'base64'
-
-              arguments[:parts][:attachments] ||= { }
-              arguments[:parts][:attachments][part.filename] = {
-                :content_type => part.content_type,
-                :content => Base64.encode64(part.body)
-              }
-            end
+  module InstanceMethods
+    def perform_delivery_postage(mail)
+      
+      arguments = {
+        :headers => {
+          'Subject' => self.subject, 
+          'From'    => self.from
+        }.merge(self.headers),
+        :parts => { }
+      }
+      
+      # Collect the parts
+      if self.parts.blank?
+        arguments[:parts][self.content_type] = self.body
+      else
+        self.parts.each do |part|
+          case part.content_disposition
+          when 'inline'
+            arguments[:parts][part.content_type] = part.body
+          when 'attachment'
+            arguments[:parts][:attachments] ||= { }
+            arguments[:parts][:attachments][part.filename] = {
+              :content_type => part.content_type,
+              :content      => Base64.encode64(part.body)
+            }
           end
         end
-        
-        Postage.send_message(
-          arguments[:parts],
-          self.recipients,
-          { },
-          arguments[:headers]
-        )
       end
+      
+      Postage.send_message(
+        arguments[:parts],
+        self.recipients,
+        { },
+        arguments[:headers]
+      )
+      
+    rescue => e
+      Postage.log.info 'Failed to perform delivery with postage'
+      Postage.log.info e.inspect
+      raise e
     end
+    
   end
 end
