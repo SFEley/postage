@@ -5,6 +5,7 @@ module Postage
   require 'logger'
   require 'postage/mailer'
   require 'postage/request'
+  require 'postage/response'
   
   class << self
     

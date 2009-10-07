@@ -31,6 +31,8 @@ class Postage::Request
     @uid ||= Time.now.to_f.to_s
   end
   
+  # Returns a json response as recieved from the PostageApp server
+  # Upon internal failure nil is returned
   def call!
     Postage.log.info "Sending Request [UID: #{self.uid} URL: #{call_url}] \n#{self.arguments.inspect}\n"
     
@@ -50,7 +52,7 @@ class Postage::Request
     
     Postage.log.info "Received Response [UID: #{self.uid}] \n#{self.response.inspect}\n"
     
-    HashWithIndifferentAccess.new(self.response)
+    Postage::Response.new(self.response)
     
   rescue Timeout::Error, SocketError, Exception => e
     Postage.log.error "Failure [UID: #{self.uid}] \n#{e.inspect}"

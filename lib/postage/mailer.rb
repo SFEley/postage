@@ -8,6 +8,7 @@ module Postage::Mailer
   end
 
   module InstanceMethods
+    
     def perform_delivery_postage(mail)
       
       arguments = {
@@ -44,8 +45,7 @@ module Postage::Mailer
       )
       
     rescue => e
-      Postage.log.info 'Failed to perform delivery with postage'
-      Postage.log.info e.inspect
+      Postage.log.info "Failed to perform delivery with postage: \n#{e.inspect}"
       raise e
     end
     
