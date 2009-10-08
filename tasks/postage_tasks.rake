@@ -29,8 +29,7 @@ end
     config_accessors = [
       [:api_key,            '               API Key: '],
       [:url,                'PostageApp service URL: '],
-      [:recipient_override, '    Recipient Override: '],
-      [:environments,       ' Active Environment(s): ']
+      [:recipient_override, '    Recipient Override: ']
     ]
     
     config_accessors.each do |k, v|
