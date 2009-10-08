@@ -45,29 +45,30 @@ end
     if response.blank?
       puts 'Failed to recieve a response. Check your configuration please.'
     else
-      puts %{
-    Account details
-    --------------------------- 
-    Name: #{response['account']['name']}
-    URL: #{response['account']['url']}
-    Transmissions:
-      this month: #{response['account']['transmissions']['this_month']}
-      today: #{response['account']['transmissions']['today']}
-      overall: #{response['account']['transmissions']['overall']}
-
-    Project details
-    --------------------------- 
-    Name: #{response['project']['name']}
-    URL: #{response['project']['url']}
-    Transmissions:
-      this month: #{response['project']['transmissions']['this_month']}
-      today: #{response['project']['transmissions']['today']}
-      overall: #{response['project']['transmissions']['overall']}
-      }
       if response[:response] == 'success'
+        puts %{
+  Account details
+  --------------------------- 
+  Name: #{response[:account][:name]}
+  URL: #{response[:account][:url]}
+  Transmissions:
+    this month: #{response[:account][:transmissions][:this_month]}
+    today: #{response[:account][:transmissions][:today]}
+    overall: #{response[:account][:transmissions][:overall]}
+
+  Project details
+  --------------------------- 
+  Name: #{response[:project][:name]}
+  URL: #{response[:project][:url]}
+  Transmissions:
+    this month: #{response[:project][:transmissions][:this_month]}
+    today: #{response[:project][:transmissions][:today]}
+    overall: #{response[:project][:transmissions][:overall]}
+        }
         puts 'Everything seems to be in order.'
       else
-        puts 'Received unexpected response. Check your configuration please.'
+        puts "Received unexpected response: #{response[:error][:message]}"
+        puts 'Check your configuration please.'
       end
     end
   end
