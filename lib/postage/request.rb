@@ -24,7 +24,7 @@ class Postage::Request
   end
   
   def call_url
-    "#{Postage.url}/api/#{Postage.api_key}/#{self.api_method}.json"
+    "#{Postage.url}/#{Postage.api_version}/#{self.api_method}.json"
   end
   
   def uid
@@ -46,7 +46,7 @@ class Postage::Request
     Timeout::timeout(2) do
       self.response = self.class.post( call_url, 
         :headers  => HEADERS,
-        :body     => { :arguments => self.arguments }.to_json
+        :body     => { :api_key => Postage.api_key, :arguments => self.arguments }.to_json
       )
     end
     

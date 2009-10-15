@@ -9,7 +9,7 @@ module Postage
   
   class << self
     
-    attr_accessor :api_key, :url, :recipient_override, :environments, :log
+    attr_accessor :api_key, :api_version, :url, :recipient_override, :environments, :log
     
     # Logging mechanism
     def log
@@ -28,7 +28,7 @@ module Postage
     
     # Url plugin is using to communicated with PostageApp
     def url
-      @url ||= 'http://postageapp.com'
+      @url ||= 'http://api.postageapp.com'
     end
     
     # Defines Rails environments when Postage kicks in instead of ActiveMailer
