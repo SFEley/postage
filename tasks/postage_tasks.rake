@@ -8,7 +8,7 @@ namespace :postage do
       key = STDIN.gets.gsub("\n", '')
     end
     
-    filename = "#{Rails.root}/config/initializers/postageapp.rb"
+    filename = "#{Rails.root}/config/initializers/postage.rb"
     
     output = "
 # Tell ActionMailer to use Postage App
