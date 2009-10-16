@@ -26,6 +26,11 @@ module Postage
       end
     end
     
+    # API version on the PostageApp server
+    def api_version
+      @api_version ||= '1.0'
+    end
+    
     # Url plugin is using to communicated with PostageApp
     def url
       @url ||= 'http://api.postageapp.com'

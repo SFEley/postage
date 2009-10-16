@@ -5,8 +5,8 @@ class RequestTest < Test::Unit::TestCase
   def setup
     Postage.configure do |config|
       config.api_key            = '1234567890abcdef'
-      config.api_version        = 'v-1-0'
-      config.url                = 'http://postageapp.local'
+      config.api_version        = '1.0'
+      config.url                = 'http://api.postageapp.local'
       config.recipient_override = 'oleg@twg.test'
       config.environments       = [:production, :staging]
     end
@@ -15,7 +15,7 @@ class RequestTest < Test::Unit::TestCase
   def test_request_setup  
     r = Postage::Request.new(:send_message, message_params)
     assert_equal :send_message, r.api_method
-    assert_equal 'http://postageapp.local/v-1-0/send_message.json', r.call_url
+    assert_equal 'http://api.postageapp.local/v.1.0/send_message.json', r.call_url
     assert !r.arguments.blank?
     assert !r.uid.blank?
   end

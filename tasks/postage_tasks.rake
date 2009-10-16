@@ -17,7 +17,6 @@ ActionMailer::Base.delivery_method = :postage
 # Specify the Postage API key
 Postage.configure do |config|
   config.api_key      = '#{key}'
-  config.api_version  = '1.0'
 end
 "
     File.open(filename, 'w'){|file| file.write(output)}

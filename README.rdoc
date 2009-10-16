@@ -1,55 +1,39 @@
 = Postage Plugin
 
 Author:: {The Working Group, Inc}[http://www.twg.ca/]
-Version:: 0.2.0
-Documentation:: http://postageapp.com/doc
+Version:: 0.1.0
+Documentation:: http://postageapp.com/docs
 
-This is the developer plug-in for Postage.
+This is the developer plug-in for PostageApp.
 
 == Installation
 
-1 - As with any typical Rails plugin, installation is done with script/plugin:
+As with any typical Rails plugin, installation is done with script/plugin:
 
   % script/plugin install git://github.com/theworkinggroup/postage.git
   
-2 -The next step would be to download a sample configuration file and copy it
-to config/postage.yml with the appropriate environment(s) set:
+Create the configuration file:
 
-  # config/postage.yml
-  development:
-    api_key: INSERT_VALID_API_KEY_HERE
+  % rake postage:setup API_KEY=YOUR_API_KEY_HERE
 
-Note that different API keys can be used for development, production, etc. by
-simply adding the appropriate section.
-
-3 - To test that the installation succeeded and that the API key is valid, run:
-
-  % rake postage:test
-  
-4 - Finally tell ActionMailer that you want your emails yo be delivered through Postage.
-
-Just add the following to your config file:
+This will create a file in RAILS_ROOT/config/initializers/postage.rb that 
+will tell ActionMailer to deliver your emails through Postage App and 
+which API key you are using.
 
   ActionMailer::Base.delivery_method = :postage
-  
-== Recipient override
+  Postage.configure do |config|
+    config.api_key = 'YOUR_API_KEY_HERE'
+  end
 
-When developing an application it is often useful to override the list of recipients with your own email. 
-this way you'll avoid sending emails to real people when you're developing your app.
+To test that the installation succeeded and that the API key is valid, run:
 
-To do this just add the following line to your development.rb file:
+  % rake postage:test
 
-  Postage.config.force_recipient = 'my_email@somewhere.com'
+== Usage
 
-You can also pass an array of emails if you need to:
-  
-  Postage.config.force_recipient = %w[ me@somewhere.com you@somewhere.com ]
-
-== Rails usage
-
-Postage integrates seamlessly with Rails. Only a few minor changes are needed when assembling your emails.
-
-You can create your email views and layouts the same way you usually do.
+Postage App integrates seamlessly with Rails. Only a few minor changes are
+needed when assembling your emails. You can still create your email views 
+and layouts the same way you usually do.
 
 === Sending one single email
 
@@ -125,26 +109,6 @@ And here's how the HTML view looks like. Notice that we're using the <tt>{{first
 To send all those emails you do, as usual:
 
   UserMailer::deliver_event_invitation(users, event)
-  
-== Rake tasks
 
-There are several Rake tasks to test and use Postage within a Rails application.
-
-To have a look at the current configuration based on the Rails environment:
-
-  rake postage:config
-
-To test that the configuration file is correctly installed and the API key is valid:
-
-  rake postage:test
-
-To see what transactions have failed to be sent to Postage and are saved in a local
-store:
-
-  rake postage:queue
-  
-To attempt delivery of the locally queued items:
-
-  rake postage:retry
 
 (C) 2009 {The Working Group, Inc}[http://www.twg.ca/]
