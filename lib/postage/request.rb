@@ -24,7 +24,7 @@ class Postage::Request
   end
   
   def call_url
-    "#{Postage.url}/#{Postage.api_version}/#{self.api_method}.json"
+    "#{Postage.url}/v.#{Postage.api_version}/#{self.api_method}.json"
   end
   
   def uid
