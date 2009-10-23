@@ -12,7 +12,7 @@ namespace :postage do
     
     output = "
 # Tell ActionMailer to use Postage App
-ActionMailer::Base.delivery_method = :postage
+ActionMailer::Base.delivery_method = :postage unless Rails.env.test?
 
 # Specify the Postage API key
 Postage.configure do |config|

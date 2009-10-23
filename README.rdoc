@@ -20,7 +20,7 @@ This will create a file in RAILS_ROOT/config/initializers/postage.rb that
 will tell ActionMailer to deliver your emails through Postage App and 
 which API key you are using.
 
-  ActionMailer::Base.delivery_method = :postage
+  ActionMailer::Base.delivery_method = :postage unless Rails.env.test?
   Postage.configure do |config|
     config.api_key = 'YOUR_API_KEY_HERE'
   end
