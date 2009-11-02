@@ -11,7 +11,7 @@ class Postage::Request
     'Content-type'             => 'application/json',
     'Accept'                   => 'text/json, application/json',
     'X-Postage-Client-Name'    => 'PostagePlugin',
-    'X-Postage-Client-Version' => Postage::VERSION
+    'X-Postage-Client-Version' => Postage::PLUGIN_VERSION
   }
   
   attr_accessor :api_method,
@@ -37,11 +37,7 @@ class Postage::Request
     Postage.log.info "Sending Request [UID: #{self.uid} URL: #{call_url}] \n#{self.arguments.inspect}\n"
     
     self.arguments[:uid]              = self.uid
-    self.arguments[:plugin_version]   = Postage::VERSION
-    
-    unless Postage.recipient_override.blank?
-      self.arguments[:recipient_override] = Postage.recipient_override
-    end
+    self.arguments[:plugin_version]   = Postage::PLUGIN_VERSION
     
     Timeout::timeout(2) do
       self.response = self.class.post( call_url, 

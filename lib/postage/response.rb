@@ -1,11 +1,13 @@
 class Postage::Response < HashWithIndifferentAccess
   
-  def error?
-    self[:response].to_s == 'error'
+  def success?
+    self[:response][:status].to_s == 'ok'
+  rescue
+    false
   end
   
-  def success?
-    self[:response].to_s == 'success'
+  def error?
+    !success?
   end
   
 end

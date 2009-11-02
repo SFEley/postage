@@ -1,4 +1,7 @@
-require File.dirname(__FILE__) + '/test_helper'
+# This tests runs against real postageapp deployment, thus make sure it's accessible
+# You can put your project's API key and real production url 'api.postageapp.com'
+
+require File.dirname(__FILE__) + '/../test_helper'
 
 class RequestTest < Test::Unit::TestCase
   
@@ -23,17 +26,19 @@ class RequestTest < Test::Unit::TestCase
   def test_request_call
     r = Postage::Request.new(:send_message, message_params)
     response = r.call!
-    assert_equal r.uid, response[:uid]
-    assert_equal 'success', response[:response], response.to_yaml
-    assert !response[:message][:id].blank?
+    assert response.success?
+    assert_equal 'ok', response[:response][:status]
+    assert_equal r.uid, response[:response][:uid]
+    assert !response[:data][:message][:id].blank?
   end
   
   def test_request_call_failure
     r = Postage::Request.new(:send_message, message_params(:message => nil))
     response = r.call!
-    assert_equal r.uid, response[:uid]
-    assert_equal 'error', response[:response]
-    assert_equal 'Message content or message template must be provided', response[:message][:error]
+    assert response.error?
+    assert_equal 'bad_request', response[:response][:status]
+    assert_equal r.uid, response[:response][:uid]
+    assert_equal 'Message content or message template must be provided', response[:data][:message][:error]
   end
   
   def test_request_call_timeout
