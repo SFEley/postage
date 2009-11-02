@@ -6,7 +6,7 @@ class RequestMethodsTest < Test::Unit::TestCase
     super
     # This tests runs against real postageapp deployment, thus make sure it's accessible
     # You can put your project's API key and real production url 'api.postageapp.com'
-    #   Postage.url     = 'api.postageapp.com'
+    #   Postage.url     = 'http://api.postageapp.com'
     #   Postage.api_key = 'your_api_key'
   end
   

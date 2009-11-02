@@ -9,7 +9,14 @@ module Postage
   require 'postage/mailer' if defined?(ActionMailer)
   
   class << self
-    attr_accessor :api_key, :api_version, :url, :recipient_override, :environments, :log
+    attr_accessor :api_key,
+                  :api_version,
+                  :url,
+                  :recipient_override,
+                  :environments,
+                  :log,
+                  :stored_failed_requests,
+                  :stored_failed_requests_path
   end
     
   # Logging mechanism
@@ -43,8 +50,20 @@ module Postage
   def self.environments
     @environments ||= ['production', 'staging']
   end
+  
+  # If a request fails we can store it as a file and re-send it later on.
+  # Here's a list of requests that we care to store:
+  def self.stored_failed_requests
+    @stored_failed_requests ||= ['send_message']
+  end
+  
+  # A path where those requests are saved
+  def self.stored_failed_requests_path
+    @stored_failed_requests_path ||= File.expand_path('../stored_requests', File.dirname(__FILE__))
+  end
     
   # Set up this configuration in /config/initializers/postage.rb
+  # You may override all defaults that were specified above.
   # 
   #   Postage.configure do |config|
   #     config.api_key = '1234567890abcdef'

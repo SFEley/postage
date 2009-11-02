@@ -6,7 +6,7 @@ class RequestTest < Test::Unit::TestCase
     super
     # This tests runs against real postageapp deployment, thus make sure it's accessible
     # You can put your project's API key and real production url 'api.postageapp.com'
-    #   Postage.url     = 'api.postageapp.com'
+    #   Postage.url     = 'http://api.postageapp.com'
     #   Postage.api_key = 'your_api_key'
   end
   
@@ -47,6 +47,26 @@ class RequestTest < Test::Unit::TestCase
     response = r.call!
     assert response.success?
     assert_equal 'This is a sample response', response.response[:message]
+  end
+  
+  def test_request_failure_and_storing_to_file
+    assert_equal ['send_message'], Postage.stored_failed_requests
+    Postage.url = 'http://not_valid_site.test'
+    arguments = {
+      :message    => {  'text/plain' => 'plain text message',
+                        'text/html'  => 'html text message' },
+      :recipients => 'oleg@twg.test' 
+    }
+    r = Postage::Request.new(:send_message, arguments)
+    assert r.uid
+    response = r.call!
+    assert !response
+    
+    filename = File.join(Postage.stored_failed_requests_path, "#{r.uid}.yaml")
+    assert File.exists?(filename)
+    file = YAML::load_file(filename)
+    assert_equal r.call_url, file[:url]
+    assert_equal r.arguments, file[:arguments]
   end
   
 end

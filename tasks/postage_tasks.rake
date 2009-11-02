@@ -25,8 +25,8 @@ end
   task :current_config => :environment do
     config_accessors = [
       [:api_key,            '               API Key: '],
-      [:api_version,        '           API version: '],
-      [:url,                'PostageApp service URL: '],
+      [:api_version,        '           API Version: '],
+      [:url,                'PostageApp Service URL: '],
       [:recipient_override, '    Recipient Override: ']
     ]
     

@@ -45,10 +45,12 @@ class Postage::Request
     self.arguments[:uid]              = self.uid
     self.arguments[:plugin_version]   = Postage::PLUGIN_VERSION
     
+    body = { :api_key => Postage.api_key, :arguments => self.arguments }.to_json
+    
     Timeout::timeout(2) do
       self.response = self.class.post( call_url, 
         :headers  => HEADERS,
-        :body     => { :api_key => Postage.api_key, :arguments => self.arguments }.to_json
+        :body     => body
       )
     end
     
@@ -58,7 +60,24 @@ class Postage::Request
     
   rescue Timeout::Error, SocketError, Exception => e
     Postage.log.error "Failure [UID: #{self.uid}] \n#{e.inspect}"
+    
+    store_failed_request
+    
     nil # no response generated
+  end
+  
+protected
+  
+  def store_failed_request
+    return unless Postage.stored_failed_requests.include?(self.api_method.to_s)
+    
+    unless File.exists?(Postage.stored_failed_requests_path)
+      FileUtils.mkdir_p(Postage.stored_failed_requests_path)
+    end
+    
+    open(File.join(Postage.stored_failed_requests_path, "#{self.uid}.yaml"), 'w') do |f|
+      f.write({:url => self.call_url, :arguments => self.arguments}.to_yaml)
+    end
   end
   
 end
