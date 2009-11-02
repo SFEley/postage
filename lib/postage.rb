@@ -4,9 +4,9 @@ module Postage
   API_VERSION     = '1.0'
   
   require 'logger'
-  require 'postage/mailer'
   require 'postage/request'
   require 'postage/response'
+  require 'postage/mailer' if defined?(ActionMailer)
   
   class << self
     attr_accessor :api_key, :api_version, :url, :recipient_override, :environments, :log
@@ -41,7 +41,7 @@ module Postage
   # This so we don't send messages during development / testing when it's not
   # neccessary to hit PostageApp
   def self.environments
-    @environments ||= [:production]
+    @environments ||= ['production', 'staging']
   end
     
   # Set up this configuration in /config/initializers/postage.rb

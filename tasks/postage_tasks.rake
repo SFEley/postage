@@ -11,9 +11,6 @@ namespace :postage do
     filename = "#{Rails.root}/config/initializers/postage.rb"
     
     output = "
-# Tell ActionMailer to use Postage App
-ActionMailer::Base.delivery_method = :postage unless Rails.env.test?
-
 # Specify the Postage API key
 Postage.configure do |config|
   config.api_key      = '#{key}'

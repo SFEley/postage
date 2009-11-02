@@ -1,16 +1,15 @@
-# When you wish to use existing ActionMailer setup just insert the following
-# line in your environment.rb file
-# 
-#   config.action_mailer.delivery_method = :postage
-#
-# Now all emails will be send with postage plugin instead of smtp server
+# By default ActionMailer delivery methods are caught by Postage.
+# It makes it easy to convert without the need to interface with Postage
+# directly. However, if you contruct your calls manually (not that hard, 
+# check documentation) you can disable ActiveMailer on your app completely.
+# Like so:
+#   config.frameworks -= [ :action_mailer ]
 
 require 'base64'
 
 module Postage::Mailer
   
   def self.included(base)
-    Postage.log.info 'Preparing ActiveMailer to use postage delivery method'
     base.send(:include, InstanceMethods)
   end
 
@@ -44,36 +43,44 @@ module Postage::Mailer
         end
       end
       
-      Postage.send_message(
+      logger.info  "Sending mail via Postage..." unless logger.nil?
+      
+      response = Postage.send_message(
         arguments[:parts],
         self.recipients,
         { },
         arguments[:headers]
       )
       
+      unless logger.nil?
+        logger.info  "Mail successfully sent. Check postage_#{Rails.env}.log for more details. UID: #{response.uid}"
+      end
+      
+      return response
+      
     rescue => e
-      Postage.log.info "Failed to perform delivery with postage: \n#{e.inspect}"
+      Postage.log.error "Failed to perform delivery with postage: \n#{e.inspect}"
       raise e
     end
   end
 end
 
-# Overriding the default ActionMailer deliver! method
+ActionMailer::Base.send :include, Postage::Mailer
+ActionMailer::Base.delivery_method = :postage
+
+# Violent override of the default ActionMailer deliver! method
+# maybe there's a better way of doing this.
 class ActionMailer::Base
   def deliver!(mail = @mail)
     raise "no mail object available for delivery!" unless mail
-    unless logger.nil?
-      logger.info  "Sent mail to #{Array(recipients).join(', ')}"
-      logger.debug "\n#{mail.encoded}"
-    end
-  
-    response = nil
+    
     begin
       response = __send__("perform_delivery_#{delivery_method}", mail) if perform_deliveries
     rescue Exception => e  # Net::SMTP errors or sendmail pipe errors
       raise e if raise_delivery_errors
     end
-  
-    return(delivery_method == :postage ? response : mail)
+    # this is the key overide. Instead of returning somewhat useless TMail object, we are more
+    # interested in the PostageApp's response
+    return response
   end
 end

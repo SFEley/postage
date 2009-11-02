@@ -6,6 +6,6 @@ class PostageTest < Test::Unit::TestCase
     assert_equal '1234567890abcdef', Postage.api_key
     assert_equal 'http://api.postageapp.local', Postage.url
     assert_equal 'oleg@twg.test', Postage.recipient_override
-    assert_equal [:production, :staging], Postage.environments
+    assert_equal ['production', 'staging', 'test'], Postage.environments
   end  
 end

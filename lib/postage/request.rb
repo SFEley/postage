@@ -36,6 +36,12 @@ class Postage::Request
   def call!
     Postage.log.info "Sending Request [UID: #{self.uid} URL: #{call_url}] \n#{self.arguments.inspect}\n"
     
+    # aborting if we are not supposed to contact PostageApp
+    unless Postage.environments.include?(defined?(Rails) ? Rails.env : ENV['RAILS_ENV'])
+      Postage.log.info "Not contacting PostageApp server. Sending back test response."
+      return Postage::Response.test_response
+    end
+    
     self.arguments[:uid]              = self.uid
     self.arguments[:plugin_version]   = Postage::PLUGIN_VERSION
     

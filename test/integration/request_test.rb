@@ -41,4 +41,12 @@ class RequestTest < Test::Unit::TestCase
     assert !response
   end
   
+  def test_request_in_test_mode
+    Postage.environments = ['production']
+    r = Postage::Request.new(:get_method_list)
+    response = r.call!
+    assert response.success?
+    assert_equal 'This is a sample response', response.response[:message]
+  end
+  
 end
