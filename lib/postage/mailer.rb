@@ -58,7 +58,6 @@ module Postage::Mailer
   end
 end
 
-
 # Overriding the default ActionMailer deliver! method
 class ActionMailer::Base
   def deliver!(mail = @mail)

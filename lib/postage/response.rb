@@ -10,4 +10,8 @@ class Postage::Response < HashWithIndifferentAccess
     !success?
   end
   
+  def data
+    self[:data]
+  end
+  
 end

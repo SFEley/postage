@@ -55,6 +55,7 @@ module Postage
   end
     
   # Sends a message to PostageApp for the project specified by the api_key
+  # For more information please check postageapp.com/docs
   # Accepts following parameters:
   #
   # message - either a hash of this format:
