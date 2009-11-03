@@ -26,11 +26,11 @@ namespace :postage do
         puts
         
         # if request was a success, remove file
-        unless Postage::Request.new.call!(request[:url], request[:arguments])
-          puts 'Failed to resend'
-        else
+        if Postage::Request.new.call!(request[:url], request[:arguments])
           puts 'Send was successful. Removing stored file.'
           FileUtils.rm File.join(file_path, file)
+        else
+          puts 'Failed to resend'
         end
       end
     end
