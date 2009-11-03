@@ -18,7 +18,7 @@ class Postage::Request
                 :arguments,
                 :response
   
-  def initialize(api_method, arguments = {})
+  def initialize(api_method = nil, arguments = {})
     @api_method = api_method
     @arguments  = arguments || {}
   end
@@ -33,8 +33,8 @@ class Postage::Request
   
   # Returns a json response as recieved from the PostageApp server
   # Upon internal failure nil is returned
-  def call!
-    Postage.log.info "Sending Request [UID: #{self.uid} URL: #{call_url}] \n#{self.arguments.inspect}\n"
+  def call!(call_url = self.call_url, arguments = self.arguments)
+    Postage.log.info "Sending Request [UID: #{self.uid} URL: #{call_url}] \n#{arguments.inspect}\n"
     
     # aborting if we are not supposed to contact PostageApp
     unless Postage.environments.include?(defined?(Rails) ? Rails.env : ENV['RAILS_ENV'])
@@ -45,7 +45,7 @@ class Postage::Request
     self.arguments[:uid]              = self.uid
     self.arguments[:plugin_version]   = Postage::PLUGIN_VERSION
     
-    body = { :api_key => Postage.api_key, :arguments => self.arguments }.to_json
+    body = { :api_key => Postage.api_key, :arguments => arguments }.to_json
     
     Timeout::timeout(2) do
       self.response = self.class.post( call_url, 
@@ -63,7 +63,7 @@ class Postage::Request
     
     store_failed_request
     
-    nil # no response generated
+    return nil # no response generated
   end
   
 protected

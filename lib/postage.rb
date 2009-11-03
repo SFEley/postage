@@ -1,6 +1,6 @@
 module Postage
   
-  PLUGIN_VERSION  = '0.0.1'
+  PLUGIN_VERSION  = '0.0.2'
   API_VERSION     = '1.0'
   
   require 'logger'
@@ -48,7 +48,7 @@ module Postage
   # This so we don't send messages during development / testing when it's not
   # neccessary to hit PostageApp
   def self.environments
-    @environments ||= ['production', 'staging']
+    @environments ||= ['production', 'staging', 'development']
   end
   
   # If a request fails we can store it as a file and re-send it later on.
