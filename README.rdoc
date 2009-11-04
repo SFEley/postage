@@ -1,10 +1,8 @@
 = Postage Plugin
 
 Author:: {The Working Group, Inc}[http://www.twg.ca/]
-Version:: 0.0.1
+Version:: 0.0.3
 Documentation:: http://postageapp.com/docs
-
-This is the developer plug-in for PostageApp.
 
 == Installation
 
@@ -30,84 +28,7 @@ To test that the installation succeeded and that the API key is valid, run:
 
 == Usage
 
-Postage App integrates seamlessly with Rails. Only a few minor changes are
-needed when assembling your emails. You can still create your email views 
-and layouts the same way you usually do.
-
-=== Sending one single email
-
-To send a single email you don't have to change anything on your typical Mailer class:
-
-  class UserMailer < ActionMailer::Base
-  
-    def forgot_password(user)
-      # Typical mail setup stuff
-      @recipients = user.email
-      @from = 'my_email@me.com'
-      @subject = 'You have requested a new password'
-      @body[:first_name] = user.first_name
-      headers("Reply-to" => @from)
-    end
-    
-  end
-
-Your HTML view also look the same as usual:
-
-  <h1>Hi <%= @first_name %>,</h1>
-
-  <p>We received a request to reset your password.  Please click <%= link_to('here', reset_password_url(user.email_validation_key))%> to temporarily log in to your account and change your password:</p>
-
-  <p>Regards,</p>
-  
-To send all those emails you do, as usual:
-
-  UserMailer::deliver_forgot_password(user)
-  
-=== Mass mailing for all!
-
-To send multiple emails in one go, Postage uses substitution variables that look like: <tt>{{some_variable}}</tt>. In order to use them you'll have to provide in the <tt>@recipients</tt> variable, the value of each substitution variable, for each of the recipients of the message. 
-
-If you wanted to use a substitution variable called <tt>{{first_name}}</tt>, you would have to build a structure similar to:
-
-  @recipients => {
-    'user_1@test.com' => { :first_name => 'User 1' },
-    'user_2@test.com' => { :first_name => 'User 2' },
-    'user_3@test.com' => ...
-    .
-    .
-  }
-
-So, let's say that you want to send personalized invitations to a bunch of people where each email looks pretty much the same except for the subject and the greeting on the top of the email. 
-
-Our UserMailer now looks a bit different since we need to collect the first name of each user. Notice that we are using a <tt>{{first_name}}</tt> substitution variable on the subject.
-
-  class UserMailer < ActionMailer::Base
-    def event_invitation(users, event)
-      # Typical mail setup stuff
-      @from = options[:from] ? options[:from] : FROM_EMAIL
-      @subject = "{{first_name}}, you have been invited to #{event.name}"
-      @body[:first_name] = user.first_name
-      headers("Reply-to" => @from)
-      
-      # Collecting Postage data
-      @recipients = { }
-      users.each do |user|
-        @recipients[user.email] = { :first_name => user.first_name }
-      end
-    end
-  end
-
-And here's how the HTML view looks like. Notice that we're using the <tt>{{first_name}}</tt> substitution variable here too.
-
-  <h1>Hi {{first_name}},</h1>
-
-  <p>You have been invited to <%= event.title %></p>
-
-  <p>Regards,</p>
-
-To send all those emails you do, as usual:
-
-  UserMailer::deliver_event_invitation(users, event)
+Please check documentation at http://postageapp.com/docs/rails
 
 
 (C) 2009 {The Working Group, Inc}[http://www.twg.ca/]

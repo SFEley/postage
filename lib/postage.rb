@@ -1,6 +1,6 @@
 module Postage
   
-  PLUGIN_VERSION  = '0.0.2'
+  PLUGIN_VERSION  = '0.0.3'
   API_VERSION     = '1.0'
   
   require 'logger'
@@ -72,44 +72,45 @@ module Postage
   def self.configure
     yield self
   end
-    
-  # Sends a message to PostageApp for the project specified by the api_key
-  # For more information please check postageapp.com/docs
+  
+  # Sends a message to PostageApp service.
   # Accepts following parameters:
   #
-  # message - either a hash of this format:
-  #   { 'text/html'  => 'html message content 
-  #     'text/plain' => 'text message content' }
-  # or a string that specifies the name of the message template that is 
-  # set up on PostageApp for this project
+  #   :message -- a hash of content with mimetype as a key. Most common use:
+  #     { 'text/plain' => 'html message content',
+  #       'text/html'  => 'plain text content' }
+  #     also takes a hash of attachments:
+  #     { 
+  #       'attachments' => {
+  #         'filename.ext' => {
+  #           'content_type'  => 'attachment_content_type',
+  #           'content'       => 'Base64_encoded_content'
+  #         }
+  #       }
+  #     }
   #
-  # recipients - this could be a string, an array of strings (email addresses)
-  # or a hash of the following format:
-  # { 'bob@bob.com'  => {'variable' => 'variable_value} 
-  #   'joe@smith.com => {'variable' => 'variable_value} }
+  #   :template_name -- should match message template name that you have
+  #     defined in your PostageApp account. Think of it as a Rails template
+  #     that wraps your message and outputs defined message variables.
   #
-  # variables - a hash of varaible_name => variable_value pairs
-  # they are used for content replacement...
+  #   :recipients -- A list of emails your message goes to. Could be in several
+  #     formats. A string, an array of strings, or hash that defines recipients
+  #     as keys and values as a hash of variables that apply to that recipient:
+  #     { 'bob@postageapp.com' => {'first_name' => 'Bob'} }
   #
-  # headers - a hash of header names and their values
+  #   :variables -- A hash of variables that can be applied by the message
+  #     template (provided it's available) or message content you send along.
+  #     { 'users_registered_so_far' => User.count }
   #
-  def self.send_message(message, recipients, variables = nil, headers = nil)
-    arguments = {}
-    arguments[:recipients] = recipients
-    
-    case (message)
-      when String then arguments[:template_name] = message
-      when Hash   then arguments[:message]       = message
-    end
-    
-    arguments[:variables] = variables unless variables.blank?
-    arguments[:headers]   = headers   unless headers.blank?
-    
+  #   :headers -- A hash of your standard email headers. Example of one you want:
+  #     { 'Subject' => 'This is my messge' }
+  #
+  # Returns Postage::Response object, or nil if request never happened.
+  def self.send_message(options = {})
     unless Postage.recipient_override.blank?
-      arguments[:recipient_override] = Postage.recipient_override
+      options[:recipient_override] = Postage.recipient_override
     end
-    
-    Postage::Request.new(:send_message, arguments).call!
+    Postage::Request.new(:send_message, options).call!
   end
 end
 

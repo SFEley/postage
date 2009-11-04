@@ -46,10 +46,9 @@ module Postage::Mailer
       logger.info  "Sending mail via Postage..." unless logger.nil?
       
       response = Postage.send_message(
-        arguments[:parts],
-        self.recipients,
-        { },
-        arguments[:headers]
+        :message    => arguments[:parts],
+        :recipients => self.recipients,
+        :headers    => arguments[:headers]
       )
       
       unless logger.nil?

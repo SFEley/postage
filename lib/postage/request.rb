@@ -47,7 +47,7 @@ class Postage::Request
     
     body = { :api_key => Postage.api_key, :arguments => arguments }.to_json
     
-    Timeout::timeout(2) do
+    Timeout::timeout(5) do
       self.response = self.class.post( call_url, 
         :headers  => HEADERS,
         :body     => body
