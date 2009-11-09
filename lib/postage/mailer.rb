@@ -52,7 +52,7 @@ module Postage::Mailer
       )
       
       unless logger.nil?
-        logger.info  "Mail successfully sent. Check postage_#{Rails.env}.log for more details. UID: #{response.uid}"
+        logger.info  "Mail successfully sent. Check postage_#{Rails.env}.log for more details. UID: #{response.response.uid}"
       end
       
       return response
