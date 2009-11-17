@@ -1,6 +1,6 @@
 module Postage
   
-  PLUGIN_VERSION  = '0.0.3'
+  PLUGIN_VERSION  = '0.0.4'
   API_VERSION     = '1.0'
   
   require 'logger'
