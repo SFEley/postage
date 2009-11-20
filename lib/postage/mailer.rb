@@ -65,7 +65,7 @@ module Postage::Mailer
 end
 
 ActionMailer::Base.send :include, Postage::Mailer
-ActionMailer::Base.delivery_method = :postage unless Rails.env.test?
+ActionMailer::Base.delivery_method = :postage if defined?(Rails) && !Rails.env.test?
 
 # Violent override of the default ActionMailer deliver! method
 # maybe there's a better way of doing this.
