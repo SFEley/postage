@@ -17,25 +17,19 @@ module Postage::Mailer
     
     def perform_delivery_postage(mail)
       
-      arguments = {
-        :headers => {
-          'Subject' => self.subject, 
-          'From'    => self.from
-        }.merge(self.headers),
-        :parts => { }
-      }
+      content     = { }
+      attachments = { }
       
       # Collect the parts
       if self.parts.blank?
-        arguments[:parts][self.content_type] = self.body
+        content[self.content_type] = self.body
       else
         self.parts.each do |part|
           case part.content_disposition
           when 'inline'
-            arguments[:parts][part.content_type] = part.body
+            content[part.content_type] = part.body
           when 'attachment'
-            arguments[:parts][:attachments] ||= { }
-            arguments[:parts][:attachments][part.filename] = {
+            attachments[part.filename] = {
               :content_type => part.content_type,
               :content      => Base64.encode64(part.body)
             }
@@ -45,11 +39,17 @@ module Postage::Mailer
       
       logger.info  "Sending mail via Postage..." unless logger.nil?
       
-      response = Postage.send_message(
-        :content    => arguments[:parts],
+      arguments = {
         :recipients => self.recipients,
-        :headers    => arguments[:headers]
-      )
+        :headers    => {
+          'subject' => self.subject, 
+          'from'    => self.from
+        }.merge(self.headers),
+        :content    => content
+      }
+      arguments.merge!(:attachments => attachments) unless attachments.blank?
+      
+      response = Postage.send_message(arguments)
       
       unless logger.nil?
         logger.info  "Mail successfully sent. Check postage_#{Rails.env}.log for more details. UID: #{response.response[:uid]}"
