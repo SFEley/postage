@@ -6,7 +6,7 @@ module Postage
   require 'logger'
   require 'postage/request'
   require 'postage/response'
-  require 'postage/mailer' if defined?(ActionMailer)
+  require 'postage/postageapp_mailer' if defined?(ActionMailer)
   
   class << self
     attr_accessor :api_key,
