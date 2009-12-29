@@ -13,6 +13,15 @@ class PostageappMailer < ActionMailer::Base
     end
   end
 
+  
+  def postageapp_variables(variables = nil)
+    if variables.nil?
+      @postageapp_variables
+    else
+      @postageapp_variables = variables
+    end
+  end
+
 
   # Delivers an email through PostageApp
   def perform_delivery_postage(mail)
@@ -50,6 +59,7 @@ class PostageappMailer < ActionMailer::Base
       :headers    => arguments[:headers]
     }
     api_params[:template] = postageapp_template unless postageapp_template.blank?
+    api_params[:variables] = postageapp_variables unless postageapp_variables.blank?
     response = Postage.send_message(api_params)
     
     unless logger.nil?
@@ -80,4 +90,11 @@ class PostageappMailer < ActionMailer::Base
     # interested in the PostageApp's response
     return response
   end
+  
+  
+  # Don't render any template if the file is not there
+  def render_message(method_name, body)
+    super if File.exists?(method_name)
+  end
+  
 end
