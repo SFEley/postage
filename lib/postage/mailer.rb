@@ -94,8 +94,12 @@ module Postage
   
     # Don't render any template if the file is not there
     def render_message(method_name, body)
-      super if File.exists?(method_name)
-    end
-  
+      case method_name
+      when ActionView::ReloadableTemplate 
+        super if File.exists?(method_name.relative_path).to_yaml
+      else
+        super if File.exists?(method_name)
+      end
+    end  
   end
 end
