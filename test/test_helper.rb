@@ -1,28 +1,23 @@
-ENV["RAILS_ENV"] = "plugin_test"
+ENV['RAILS_ENV'] = 'test'
 
-require 'rubygems'
-require 'test/unit'
+require File.expand_path(File.dirname(__FILE__) + "/rails_root/config/environment")
+require 'test_help'
 
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-
-require 'active_support'
-require 'action_mailer'
 require 'redgreen' unless ENV['TM_FILEPATH']
-require 'yaml'
 
-require 'postage'
+Postage::Mailer.template_root = Rails.root.join('..', 'notifier')
+#raise Postage::Mailer.template_root.to_s
 
-class Test::Unit::TestCase
+class ActiveSupport::TestCase
   
+  # Most of the tests are hitting actual PostageApp application
+  # Thus we need configuration that works
   def setup
-    # setting up initial plugin settings
+    # resetting postage configs
     Postage.configure do |config|
       config.api_key            = '1234567890abcdef'
-      config.api_version        = '1.0'
       config.url                = 'http://api.postageapp.local'
       config.recipient_override = 'oleg@twg.test'
-      config.environments       = ['production', 'staging', 'plugin_test']
     end
   end
   

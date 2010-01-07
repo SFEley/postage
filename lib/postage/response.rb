@@ -1,14 +1,7 @@
+# Response that is retuned by PostageApp server. Normally, a hash is expected
+# This is just a simple wrapper with some helper methods
+#
 class Postage::Response < HashWithIndifferentAccess
-  
-  # Just a fake response that can be used in testing environment
-  def self.test_response
-    self.new(
-      :response => {
-        :status   => 'ok',
-        :message  => 'This is a sample response'
-      }
-    )
-  end
   
   def success?
     self[:response][:status].to_s == 'ok'

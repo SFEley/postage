@@ -1,6 +1,3 @@
-# Postage::Request.api_method maps to the possible actions on the PostageApp
-# current list is: get_method_list, get_project_info, send_message
-
 class Postage::Request
   
   require 'httparty'
@@ -24,7 +21,7 @@ class Postage::Request
   end
   
   def call_url
-    "#{Postage.url}/v.#{Postage.api_version}/#{self.api_method}.json"
+    "#{Postage.url}/v.#{Postage::API_VERSION}/#{self.api_method}.json"
   end
   
   def uid
@@ -33,14 +30,8 @@ class Postage::Request
   
   # Returns a json response as recieved from the PostageApp server
   # Upon internal failure nil is returned
-  def call!(call_url = self.call_url, arguments = self.arguments)
-    Postage.log.info "Sending Request [UID: #{self.uid} URL: #{call_url}] \n#{arguments.inspect}\n"
-    
-    # aborting if we are not supposed to contact PostageApp
-    unless Postage.environments.include?(defined?(Rails) ? Rails.env : ENV['RAILS_ENV'])
-      Postage.log.info "Not contacting PostageApp server. Sending back test response."
-      return Postage::Response.test_response
-    end
+  def call(call_url = self.call_url, arguments = self.arguments)
+    Postage.logger.info "Sending Request [UID: #{self.uid} URL: #{call_url}] \n#{arguments.inspect}\n"
     
     self.arguments[:uid]              = self.uid
     self.arguments[:plugin_version]   = Postage::PLUGIN_VERSION
@@ -54,15 +45,14 @@ class Postage::Request
       )
     end
     
-    Postage.log.info "Received Response [UID: #{self.uid}] \n#{self.response.inspect}\n"
+    Postage.logger.info "Received Response [UID: #{self.uid}] \n#{self.response.inspect}\n"
     
     Postage::Response.new(self.response)
     
   rescue Timeout::Error, SocketError, Exception => e
-    Postage.log.error "Failure [UID: #{self.uid}] \n#{e.inspect}"
+    Postage.logger.error "Failure [UID: #{self.uid}] \n#{e.inspect}"
     
     store_failed_request
-    
     return nil # no response generated
   end
   
