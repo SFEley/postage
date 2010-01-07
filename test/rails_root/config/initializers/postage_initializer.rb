@@ -1,1 +1,0 @@
-../../../postage_initializer.rb

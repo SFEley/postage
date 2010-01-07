@@ -1,29 +1,21 @@
-# Response that is retuned by PostageApp server. Normally, a hash is expected
-# This is just a simple wrapper with some helper methods
+require 'ostruct'
+
+# A simple wrapper around responses. Generally there are following methods available:
 #
-class Postage::Response < HashWithIndifferentAccess
+#   response
+#   api
+#   data
+#
+class Postage::Response < OpenStruct
   
   def success?
-    self[:response][:status].to_s == 'ok'
+    self.response['status'] == 'ok'
   rescue
     false
   end
   
   def error?
     !success?
-  end
-  
-  # -- Logical partitions of the response -----------------------------------
-  def response
-    self[:response]
-  end
-  
-  def api
-    self[:api]
-  end
-  
-  def data
-    self[:data]
   end
   
 end

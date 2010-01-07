@@ -59,13 +59,13 @@ class Postage::Request
 protected
   
   def store_failed_request
-    return unless Postage.stored_failed_requests.include?(self.api_method.to_s)
+    return unless Postage.failed_calls.include?(self.api_method.to_s)
     
-    unless File.exists?(Postage.stored_failed_requests_path)
-      FileUtils.mkdir_p(Postage.stored_failed_requests_path)
+    unless File.exists?(Postage.failed_calls_path)
+      FileUtils.mkdir_p(Postage.failed_calls_path)
     end
     
-    open(File.join(Postage.stored_failed_requests_path, "#{self.uid}.yaml"), 'w') do |f|
+    open(File.join(Postage.failed_calls_path, "#{self.uid}.yaml"), 'w') do |f|
       f.write({:url => self.call_url, :arguments => self.arguments}.to_yaml)
     end
   end

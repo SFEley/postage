@@ -1,5 +1,7 @@
 class TestNotifier < Postage::Mailer
   
+  self.template_root = File.dirname(__FILE__) + '/templates/'
+  
   def blank
     # ...
   end
@@ -10,22 +12,22 @@ class TestNotifier < Postage::Mailer
   
   def with_text_only_view
     setup_headers
-    # ...
   end
   
   def with_html_and_text_views
     setup_headers
-    # ...
+  end
+  
+  def with_simple_view
+    setup_headers
   end
   
   def with_manual_parts
     setup_headers
-    # ...
   end
   
   def with_custom_postage_variables
     setup_headers
-    # ...
   end
   
 private

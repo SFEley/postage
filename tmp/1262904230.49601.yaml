@@ -1,0 +1,9 @@
+--- 
+:arguments: 
+  :recipients: oleg@twg.test
+  :message: 
+    text/html: html text message
+    text/plain: plain text message
+  :uid: "1262904230.49601"
+  :plugin_version: 0.0.5
+:url: http://not-valid-site.test/v.1.0/send_message.json

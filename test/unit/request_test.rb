@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class RequestTest < ActiveSupport::TestCase
+class RequestTest < Test::Unit::TestCase
   
   def test_request_setup  
     r = Postage::Request.new(:get_method_list)
@@ -13,8 +13,8 @@ class RequestTest < ActiveSupport::TestCase
     r = Postage::Request.new(:get_method_list)
     response = r.call
     assert response.success?
-    assert_equal 'ok', response[:response][:status]
-    assert_equal r.uid, response[:response][:uid]
+    assert_equal 'ok', response.response['status']
+    assert_equal r.uid, response.response['uid']
     assert !response.data.blank?
   end
   
@@ -22,8 +22,8 @@ class RequestTest < ActiveSupport::TestCase
     r = Postage::Request.new(:get_method_that_does_not_exist)
     response = r.call
     assert response.error?
-    assert_equal 'internal_server_error', response[:response][:status]
-    assert_equal r.uid, response[:response][:uid]
+    assert_equal 'internal_server_error', response.response['status']
+    assert_equal r.uid, response.response['uid']
   end
   
   def test_request_call_timeout
@@ -34,7 +34,7 @@ class RequestTest < ActiveSupport::TestCase
   end
   
   def test_request_failure_and_storing_to_file
-    assert_equal ['send_message'], Postage.stored_failed_requests
+    assert_equal ['send_message'], Postage.failed_calls
     Postage.url = 'http://not-valid-site.test'
     arguments = {
       :message    => {  'text/plain' => 'plain text message',
@@ -46,7 +46,7 @@ class RequestTest < ActiveSupport::TestCase
     response = r.call
     assert !response
     
-    filename = File.join(Postage.stored_failed_requests_path, "#{r.uid}.yaml")
+    filename = File.join(Postage.failed_calls_path, "#{r.uid}.yaml")
     assert File.exists?(filename)
     file = YAML::load_file(filename)
     assert_equal r.call_url, file[:url]

@@ -1,3 +1,5 @@
+require 'action_mailer'
+
 # Postage::Mailer allows you to use/re-use existing mailers set up using
 # ActionMailer. The only catch is to change inheritance from ActionMailer::Base
 # to Postage::Mailer
@@ -26,7 +28,7 @@ class Postage::Mailer < ActionMailer::Base
   
   require 'base64'
   
-  self.delivery_method = :postage unless Rails.env.test?
+  self.delivery_method = :postage # unless Rails.env.test?
   
   # adv_attr_accessor :postage_template
   # adv_attr_accessor :postage_variables
@@ -39,7 +41,6 @@ class Postage::Mailer < ActionMailer::Base
   # Creating a Postage::Request object unlike TMail one in ActionMailer::Base
   def create_mail
     params = { }
-    
     params[:recipients] = self.recipients unless self.recipients.blank?
     
     params[:headers] = { }
@@ -51,14 +52,14 @@ class Postage::Mailer < ActionMailer::Base
     params[:attachments] = { }
     
     if @parts.empty?
-      params[:content]['text/plain'] = @body.to_s unless @body.blank?
+      params[:content][self.content_type] = self.body unless self.body.blank?
     else
       self.parts.each do |part|
         case part.content_disposition
         when 'inline'
-          arguments[:content][part.content_type] = part.body
+          params[:content][part.content_type] = part.body
         when 'attachment'
-          arguments[:attachments][part.filename] = {
+          params[:attachments][part.filename] = {
             :content_type => part.content_type,
             :content      => Base64.encode64(part.body)
           }
@@ -78,13 +79,10 @@ class Postage::Mailer < ActionMailer::Base
   
   # Not insisting rendering a view if it's not there. Postage can send blank content
   # provided that the template is defined.
-  # def render_message(method_name, body)
-  #   case method_name
-  #   when ActionView::ReloadableTemplate 
-  #     super if File.exists?(method_name.relative_path).to_yaml
-  #   else
-  #     super if File.exists?(method_name)
-  #   end
-  # end
+  def render(opts)
+    super(opts)
+  rescue ActionView::MissingTemplate
+    # do nothing
+  end
   
 end

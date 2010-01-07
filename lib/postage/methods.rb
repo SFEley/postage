@@ -1,4 +1,4 @@
-module Postage::ApiMethods
+module Postage::Methods
   class << self
     # Sends a message to PostageApp service.
     # Accepts following parameters:

@@ -1,19 +1,19 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class ConfigurationTest < ActiveSupport::TestCase
+class ConfigurationTest < Test::Unit::TestCase
   
   def test_default_response
     response = Postage::Response.new(
       :response => {
-        :uid    => '1234567890.12345',
-        :status => 'ok'
+        'uid'    => '1234567890.12345',
+        'status' => 'ok'
       },
       :api => {
-        :version  => '1.0',
-        :key      => 'abcdefg12345'
+        'version'  => '1.0',
+        'key'      => 'abcdefg12345'
       },
       :data => {
-        :something => 'blah'
+        'something' => 'blah'
       }
     )
     

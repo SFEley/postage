@@ -36,7 +36,8 @@ module Postage
   require 'postage/request'
   require 'postage/response'
   require 'postage/methods'
-  require 'postage/mailer' if defined?(ActionMailer)
+  require 'postage/mailer'
+  require 'logger'
   
   class << self
     attr_accessor :api_key,
@@ -50,12 +51,12 @@ module Postage
       @url ||= 'http://api.postageapp.com'
     end
     
-    def stored_failed_requests
-      @stored_failed_requests ||= ['send_message']
+    def failed_calls
+      @failed_calls ||= ['send_message']
     end
     
-    def stored_failed_requests_path
-      @stored_failed_requests_path ||= Rails.root.join('tmp', 'stored_requests')
+    def failed_calls_path
+      @failed_calls_path ||= Rails.root.join('tmp', 'stored_requests')
     end
     
     def logger
@@ -66,8 +67,8 @@ module Postage
       yield self
     end
     
-    def call(*args)
-      Postage::ApiMethods.send(args.first, args.extract_options!)
+    def call(method, arguments = {})
+      Postage::Methods.send(method, arguments)
     end
   end
 end

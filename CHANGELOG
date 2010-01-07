@@ -1,6 +1,7 @@
 -- 0.0.5
   * Better Mailer derived from ActionMailer
   * Better testing suite
+  * Postage::Response is derived from OpenStruct
   * General cleanup
 
 -- 0.0.4

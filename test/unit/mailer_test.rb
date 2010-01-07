@@ -1,6 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
+require File.dirname(__FILE__) + '/../test_notifier'
 
-class MailerTest < ActiveSupport::TestCase
+class MailerTest < Test::Unit::TestCase
   
   def test_create_blank
     assert request = TestNotifier.create_blank
@@ -26,8 +27,7 @@ class MailerTest < ActiveSupport::TestCase
   
   def test_create_with_text_only_view
     assert request = TestNotifier.create_with_text_only_view
-    raise request.to_yaml
-    assert_equal '', request.arguments[:content]
+    assert_equal 'text only: plain text', request.arguments[:content]['text/plain']
   end
   
   def test_deliver_with_text_only_view
@@ -36,10 +36,20 @@ class MailerTest < ActiveSupport::TestCase
   
   def test_create_with_html_and_text_views
     assert request = TestNotifier.create_with_html_and_text_views
-    raise request.to_yaml
+    assert_equal 'html and text: plain text', request.arguments[:content]['text/plain']
+    assert_equal 'html and text: html', request.arguments[:content]['text/html']
   end
   
   def test_deliver_with_html_and_text_views
+    # ...
+  end
+  
+  def test_create_with_simple_view
+    assert request = TestNotifier.create_with_simple_view
+    assert_equal 'simple view content', request.arguments[:content]['text/plain']
+  end
+  
+  def teste_deliver_with_simple_view
     # ...
   end
   
