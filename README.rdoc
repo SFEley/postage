@@ -28,6 +28,15 @@ To test that the installation succeeded and that the API key is valid, run:
 
 == Usage
 
+<b>Note:</b> To quickly convert your existing mailers make sure that they 
+inherit from Postage::Mailer instead of ActionMailer::Base like so:
+
+  class MyNotifier < Postage::Mailer
+    def signup_notification(recipient)
+      # ...
+    end
+  end
+
 Please check documentation at http://postageapp.com/docs/rails
 
 
