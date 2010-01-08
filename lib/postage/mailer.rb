@@ -28,15 +28,21 @@ class Postage::Mailer < ActionMailer::Base
   
   require 'base64'
   
-  self.delivery_method = :postage # unless Rails.env.test?
+  self.delivery_method = :postage unless( defined?(Rails) && Rails.env.test? )
   
-  # adv_attr_accessor :postage_template
-  # adv_attr_accessor :postage_variables
+  adv_attr_accessor :postage_template
+  adv_attr_accessor :postage_variables
   
-  def perform_delivery_postage
-    # ...
+  def perform_delivery_postage(mail)
+    mail.call
   end
   
+  # By default ActionMailer returns TMail object. In our case Postage::Response
+  # is way more useful
+  def deliver!(mail = @mail)
+    raise 'Postage::Request object not present, cannot deliver' unless mail
+    __send__("perform_delivery_#{delivery_method}", mail) if perform_deliveries
+  end
   
   # Creating a Postage::Request object unlike TMail one in ActionMailer::Base
   def create_mail
@@ -67,8 +73,8 @@ class Postage::Mailer < ActionMailer::Base
       end
     end
     
-    # api_params[:template] = postageapp_template unless postageapp_template.blank?
-    # api_params[:variables] = postageapp_variables unless postageapp_variables.blank?
+    params[:template] = self.postage_template unless self.postage_template.blank?
+    params[:variables] = self.postage_variables unless self.postage_variables.blank?
     
     params.delete(:headers)     if params[:headers].blank?
     params.delete(:content)     if params[:content].blank?

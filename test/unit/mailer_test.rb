@@ -10,10 +10,6 @@ class MailerTest < Test::Unit::TestCase
     assert request.arguments.blank?
   end
   
-  def test_deliver_blank
-    # ...
-  end
-  
   def test_create_with_no_content
     assert request = TestNotifier.create_with_no_content
     assert_equal 'test@test.test', request.arguments[:recipients]
@@ -21,17 +17,9 @@ class MailerTest < Test::Unit::TestCase
     assert request.arguments[:content].blank?
   end
   
-  def test_deliver_with_no_content
-    # ...
-  end
-  
   def test_create_with_text_only_view
     assert request = TestNotifier.create_with_text_only_view
     assert_equal 'text only: plain text', request.arguments[:content]['text/plain']
-  end
-  
-  def test_deliver_with_text_only_view
-    # ...
   end
   
   def test_create_with_html_and_text_views
@@ -41,7 +29,9 @@ class MailerTest < Test::Unit::TestCase
   end
   
   def test_deliver_with_html_and_text_views
-    # ...
+    assert response = TestNotifier.deliver_with_html_and_text_views
+    assert response.is_a?(Postage::Response)
+    assert response.success?
   end
   
   def test_create_with_simple_view
@@ -49,24 +39,19 @@ class MailerTest < Test::Unit::TestCase
     assert_equal 'simple view content', request.arguments[:content]['text/plain']
   end
   
-  def teste_deliver_with_simple_view
-    # ...
-  end
-  
   def test_create_with_manual_parts
-    # ...
-  end
-  
-  def test_deliver_with_manual_parts
-    # ...
+    assert request = TestNotifier.create_with_manual_parts
+    assert_equal 'text content', request.arguments[:content]['text/plain']
+    assert_equal 'html content', request.arguments[:content]['text/html']
+    assert !request.arguments[:attachments].blank?
+    assert !request.arguments[:attachments]['foo.jpg'][:content].blank?
+    assert_equal 'image/jpeg', request.arguments[:attachments]['foo.jpg'][:content_type]
   end
   
   def test_create_with_custom_postage_variables
-    # ...
-  end
-  
-  def test_deliver_with_custom_postage_variables
-    # ...
+    assert request = TestNotifier.create_with_custom_postage_variables
+    assert_equal 'test_template', request.arguments[:template]
+    assert_equal ({:variable => 'value'}), request.arguments[:variables]
   end
   
 end

@@ -24,10 +24,23 @@ class TestNotifier < Postage::Mailer
   
   def with_manual_parts
     setup_headers
+    
+    part  :content_type => 'text/html',
+          :body         => 'html content'
+    
+    part  :content_type => 'text/plain',
+          :body         => 'text content'
+    
+    attachment  :content_type => 'image/jpeg', 
+                :filename     => 'foo.jpg',
+                :body         => '123456789'
   end
   
   def with_custom_postage_variables
     setup_headers
+    
+    postage_template 'test_template'
+    postage_variables :variable => 'value'
   end
   
 private
