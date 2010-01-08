@@ -3,7 +3,7 @@
   * Better testing suite
   * Better documentation
   * Postage::Response is derived from OpenStruct
-  * General cleanup
+  * Failed Postage::Request is logged with Hoptoad (if it's installed)
 
 -- 0.0.4
   * Small fixes and tweaks

@@ -37,37 +37,34 @@ class Postage::Request
     self.arguments[:plugin_version]   = Postage::PLUGIN_VERSION
     
     body = { :api_key => Postage.api_key, :arguments => arguments }.to_json
-    
     Timeout::timeout(5) do
-      self.response = self.class.post( call_url, 
-        :headers  => HEADERS,
-        :body     => body
-      )
+      self.response = self.class.post( call_url, :headers => HEADERS, :body => body )
     end
     
     Postage.logger.info "Received Response [UID: #{self.uid}] \n#{self.response.inspect}\n"
-    
-    Postage::Response.new(self.response)
+    return Postage::Response.new(self.response)
     
   rescue Timeout::Error, SocketError, Exception => e
     Postage.logger.error "Failure [UID: #{self.uid}] \n#{e.inspect}"
     
-    store_failed_request
+    store_failed_request(e)
     return nil # no response generated
   end
   
 protected
   
-  def store_failed_request
+  def store_failed_request(e)
     return unless Postage.failed_calls.include?(self.api_method.to_s)
     
-    unless File.exists?(Postage.failed_calls_path)
-      FileUtils.mkdir_p(Postage.failed_calls_path)
-    end
+    # notification for hoptoad users
+    notify_hoptoad(e) if defined?(Hoptoad)
+    
+    # creating directory, unless if already exists
+    FileUtils.mkdir_p(Postage.failed_calls_path) unless File.exists?(Postage.failed_calls_path)
     
     open(File.join(Postage.failed_calls_path, "#{self.uid}.yaml"), 'w') do |f|
       f.write({:url => self.call_url, :arguments => self.arguments}.to_yaml)
     end
+    
   end
-  
 end
