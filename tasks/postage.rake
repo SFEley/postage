@@ -122,7 +122,7 @@ def send_test_message(recipients)
     recipients_with_variables[email] = {'name' => name}
   end
   
-  Postage.send_message(
+  Postage.call(:send_message,
     :message => {
       'text/html'  => HTML_MESSAGE,
       'text/plain' => TEXT_MESSAGE
