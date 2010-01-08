@@ -1,5 +1,3 @@
-ENV['RAILS_ENV'] = 'test'
-
 require 'rubygems'
 require 'test/unit'
 require 'postage'
