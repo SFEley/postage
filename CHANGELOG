@@ -1,9 +1,10 @@
--- 0.0.5
+-- 1.0.0
   * Better Mailer derived from ActionMailer
   * Better testing suite
   * Better documentation
   * Postage::Response is derived from OpenStruct
   * Failed Postage::Request is logged with Hoptoad (if it's installed)
+  * Failed Postage::Request is re-transmitted with the next successful one
 
 -- 0.0.4
   * Small fixes and tweaks

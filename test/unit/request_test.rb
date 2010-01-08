@@ -33,11 +33,11 @@ class RequestTest < Test::Unit::TestCase
     assert !response
   end
   
-  def test_request_failure_and_storing_to_file
+  def test_request_failure_and_storing_to_file_and_resending
     assert_equal ['send_message'], Postage.failed_calls
     Postage.url = 'http://not-valid-site.test'
     arguments = {
-      :message    => {  'text/plain' => 'plain text message',
+      :content    => {  'text/plain' => 'plain text message',
                         'text/html'  => 'html text message' },
       :recipients => 'oleg@twg.test' 
     }
@@ -51,6 +51,16 @@ class RequestTest < Test::Unit::TestCase
     file = YAML::load_file(filename)
     assert_equal r.call_url, file[:url]
     assert_equal r.arguments, file[:arguments]
+    
+    # fixing stored file to prepare for resending
+    Postage.url = 'http://api.postageapp.local'
+    file[:url] = Postage.url + '/v.1.0/send_message.json'
+    open(filename, 'w') do |f|
+      f.write(file.to_yaml)
+    end
+    
+    # calling a request that should succeed
+    Postage::Request.new(:get_method_list).call
   end
   
 end
