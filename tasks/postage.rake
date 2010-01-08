@@ -40,7 +40,7 @@ end
   task :test => :environment do 
     
     puts "Attempting to contact PostageApp..."
-    response = Postage::Request.new(:get_project_info).call!
+    response = Postage::Request.new(:get_project_info).call
     
     unless response.blank?
       
