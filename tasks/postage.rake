@@ -45,9 +45,9 @@ end
     unless response.blank?
       
       if response.success?
-        project_name  = response.data[:project][:name]
-        project_url   = response.data[:project][:url]
-        user_emails   = response.data[:project][:users]
+        project_name  = response.data['project']['name']
+        project_url   = response.data['project']['url']
+        user_emails   = response.data['project']['users']
         
         puts %{
   Found Project:
