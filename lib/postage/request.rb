@@ -95,5 +95,7 @@ protected
         Postage.logger.info '-- Failed to resend'
       end
     end
+  rescue Errno::ENOENT
+    # do nothing, we never had failed requests
   end
 end
