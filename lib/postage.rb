@@ -24,7 +24,7 @@
 # 
 # Example:
 # 
-#   Postage.call!(:send_message, :template => 'my_template', :recipients => 'oleg@twg.ca')
+#   Postage.call(:send_message, :template => 'my_template', :recipients => 'oleg@twg.ca')
 # 
 # Example above will return a Postage::Response object (a glorified hash) if successful
 #

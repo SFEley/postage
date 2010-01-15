@@ -21,7 +21,7 @@ require 'action_mailer'
 #
 # Sending email
 #
-#   Notifier.deliver_signup_notification(user) # contacts PostageApp and returns Postage::Response
+#   Notifier.deliver_signup_notification(user) # attempts to deliver to PostageApp (depending on env)
 #   request = Notifier.create_signup_notification(user) # creates Postage::Request object
 #
 class Postage::Mailer < ActionMailer::Base
