@@ -30,7 +30,7 @@
 #
 module Postage
   
-  PLUGIN_VERSION  = '1.0.0'
+  PLUGIN_VERSION  = '1.0.1'
   API_VERSION     = '1.0'
   
   require 'postage/request'

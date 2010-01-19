@@ -54,4 +54,10 @@ class MailerTest < Test::Unit::TestCase
     assert_equal ({:variable => 'value'}), request.arguments[:variables]
   end
   
+  def test_create_with_recipient_override
+    Postage.recipient_override = 'oleg@test.test'
+    assert request = TestNotifier.create_blank
+    assert_equal 'oleg@test.test', request.arguments[:recipient_override]
+  end
+  
 end

@@ -37,8 +37,6 @@ class Postage::Mailer < ActionMailer::Base
     mail.call
   end
   
-  # By default ActionMailer returns TMail object. In our case Postage::Response
-  # is way more useful
   def deliver!(mail = @mail)
     raise 'Postage::Request object not present, cannot deliver' unless mail
     __send__("perform_delivery_#{delivery_method}", mail) if perform_deliveries
@@ -79,6 +77,10 @@ class Postage::Mailer < ActionMailer::Base
     params.delete(:headers)     if params[:headers].blank?
     params.delete(:content)     if params[:content].blank?
     params.delete(:attachments) if params[:attachments].blank?
+    
+    unless Postage.recipient_override.blank?
+      params[:recipient_override] = Postage.recipient_override
+    end
     
     @mail = Postage::Request.new(:send_message, params)
   end
