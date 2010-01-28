@@ -25,10 +25,12 @@ end
   desc 'Check current plugin configuration'
   task :current_config => :environment do
     config_accessors = [
-      [:api_key,            '               API Key: '],
-      [:api_version,        '           API Version: '],
-      [:url,                'PostageApp Service URL: '],
-      [:recipient_override, '    Recipient Override: ']
+      [:api_key,            '                    API Key: '],
+      [:url,                '     PostageApp Service URL: '],
+      [:recipient_override, '         Recipient Override: '],
+      [:failed_calls,       'Types of failed calls saved: '],
+      [:failed_calls_path,  '      Failed calls saved to: '],
+      [:logger,             '                     Logger: ']
     ]
     
     config_accessors.each do |k, v|
