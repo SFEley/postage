@@ -47,6 +47,17 @@ module Postage
                   :failed_calls,
                   :failed_calls_path
     
+    # Delegates to Postage::Mailer; this is a convenience for overriding Postage at configuration 
+    # time for development, test integration, etc.
+    def delivery_method=(val)
+      Mailer.delivery_method = val
+    end
+    
+    # Delegates to Postage::Mailer
+    def delivery_method
+      Mailer.delivery_method
+    end
+    
     def url
       @url ||= 'http://api.postageapp.com'
     end
@@ -66,6 +77,8 @@ module Postage
     def configure
       yield self
     end
+    
+    
     
     def call(method, arguments = {})
       Postage::Methods.send(method, arguments)
